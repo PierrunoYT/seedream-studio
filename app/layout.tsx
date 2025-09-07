@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     siteName: 'Seedream Studio',
     images: [
       {
-        url: '/logo.png',
+        url: 'https://seedream.studio/logo.png',
         width: 1200,
         height: 630,
         alt: 'Seedream Studio Logo',
@@ -43,8 +43,17 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Seedream Studio',
     description: 'Where Dreams Take Shape - Creative studio bringing your visions to life',
-    images: ['/logo.png'],
+    images: ['https://seedream.studio/logo.png'],
     creator: '@seedreamstudio',
+  },
+  
+  // Additional meta for better compatibility
+  other: {
+    'og:image:width': '1200',
+    'og:image:height': '630',
+    'og:image:type': 'image/png',
+    'twitter:image:src': 'https://seedream.studio/logo.png',
+    'application-name': 'Seedream Studio',
   },
   
   // Icons
