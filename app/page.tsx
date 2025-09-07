@@ -7,21 +7,32 @@ export default function Home() {
       {/* Main content */}
       <main className="relative z-10 text-center px-8 flex flex-col items-center justify-center">
         {/* Logo */}
-        <img
-          src="/logo.png"
-          alt="Seedream Studio Logo"
-          className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 mb-4 object-contain"
-        />
+        <div className="logo-container mb-4">
+          <img
+            src="/logo.png"
+            alt="Seedream Studio Logo"
+            className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain animate-logo cursor-pointer"
+          />
+        </div>
         
         {/* Title */}
-        <h1 className="text-6xl sm:text-8xl md:text-9xl font-extralight tracking-widest text-white drop-shadow-2xl">
-          Seedream{' '}
-          <span className="wave-letter">S</span>
-          <span className="wave-letter">t</span>
-          <span className="wave-letter">u</span>
-          <span className="wave-letter">d</span>
-          <span className="wave-letter">i</span>
-          <span className="wave-letter">o</span>
+
+        <h1 className="text-6xl sm:text-8xl md:text-9xl font-extralight tracking-widest text-white drop-shadow-2xl">
+          <span className="wave-letter">S</span>
+          <span className="wave-letter">e</span>
+          <span className="wave-letter">e</span>
+          <span className="wave-letter">d</span>
+          <span className="wave-letter">r</span>
+          <span className="wave-letter">e</span>
+          <span className="wave-letter">a</span>
+          <span className="wave-letter">m</span>
+          <span className="wave-letter mx-4"> </span>
+          <span className="wave-letter">S</span>
+          <span className="wave-letter">t</span>
+          <span className="wave-letter">u</span>
+          <span className="wave-letter">d</span>
+          <span className="wave-letter">i</span>
+          <span className="wave-letter">o</span>
         </h1>
         
         {/* Decorative line */}
