@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seedream Studio - Animated Splash Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+        }
+
+        .splash-container {
+            display: grid;
+            grid-template-rows: 20px 1fr 20px;
+            align-items: center;
+            justify-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            
+            /* Static gradient background */
+            background: linear-gradient(135deg, #a855f7, #ec4899, #ef4444);
+        }
+
+        .overlay-1 {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, transparent, rgba(255,255,255,0.1), transparent);
+            animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .overlay-2 {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.2), transparent, transparent);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            grid-row-start: 2;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .title {
+            font-size: clamp(3rem, 8vw, 8rem);
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            filter: drop-shadow(0 25px 25px rgba(0, 0, 0, 0.25));
+        }
+
+        @keyframes fadeZoomIn {
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            25% { transform: translateY(-8px) scale(1.02); }
+            50% { transform: translateY(-4px) scale(1.01); }
+            75% { transform: translateY(-12px) scale(1.03); }
+        }
+
+        .subtitle {
+            margin-top: 2rem;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 2s ease-out 2.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Dark mode styles */
+        @media (prefers-color-scheme: dark) {
+            .splash-container {
+                background: linear-gradient(135deg, #581c87, #1e1b4b, #312e81);
+            }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 640px) {
+            .splash-container {
+                padding: 1rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-container">
+        <div class="overlay-1"></div>
+        <div class="overlay-2"></div>
+        
+        <main class="main-content">
+            <h1 class="title">Seedream Studio</h1>
+            <p class="subtitle">Where dreams take shape</p>
+        </main>
+    </div>
+</body>
+</html>
