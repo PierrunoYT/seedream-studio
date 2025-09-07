@@ -15,6 +15,39 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Seedream Studio",
   description: "Where Dreams Take Shape - Creative studio bringing your visions to life",
+  keywords: "creative studio, design, dreams, seedream, branding, web design",
+  authors: [{ name: "Seedream Studio" }],
+  creator: "Seedream Studio",
+  publisher: "Seedream Studio",
+  
+  // Open Graph / Facebook
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://seedream.studio',
+    title: 'Seedream Studio',
+    description: 'Where Dreams Take Shape - Creative studio bringing your visions to life',
+    siteName: 'Seedream Studio',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Seedream Studio Logo',
+      },
+    ],
+  },
+  
+  // Twitter
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Seedream Studio',
+    description: 'Where Dreams Take Shape - Creative studio bringing your visions to life',
+    images: ['/logo.png'],
+    creator: '@seedreamstudio',
+  },
+  
+  // Icons
   icons: {
     icon: [
       { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
@@ -29,9 +62,14 @@ export const metadata: Metadata = {
       { url: '/favicon/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' }
     ]
   },
+  
   manifest: '/favicon/site.webmanifest',
   themeColor: '#667eea',
   viewport: 'width=device-width, initial-scale=1',
+  robots: 'index, follow',
+  alternates: {
+    canonical: 'https://seedream.studio',
+  },
 };
 
 export default function RootLayout({
