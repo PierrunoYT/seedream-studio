@@ -132,21 +132,135 @@
     }
   }
 
-  /* Soft glow pulse - text shadow only, no box shadow */
-  .animate-glow {
-    animation: glow 4s ease-in-out infinite alternate;
+  /* Modern sophisticated background animations */
+  .dream-bg {
+    background:
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%),
+      linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    animation: dream-shift 20s ease-in-out infinite;
   }
 
-  @keyframes glow {
-    from {
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3),
-                   0 0 40px rgba(147, 51, 234, 0.2),
-                   0 0 60px rgba(236, 72, 153, 0.1);
+  @keyframes dream-shift {
+    0%, 100% {
+      background:
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%),
+        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
-    to {
-      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5),
-                   0 0 60px rgba(147, 51, 234, 0.3),
-                   0 0 90px rgba(236, 72, 153, 0.2);
+    25% {
+      background:
+        radial-gradient(circle at 60% 20%, rgba(255, 119, 198, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 20% 60%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
+        linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+    50% {
+      background:
+        radial-gradient(circle at 80% 60%, rgba(120, 119, 198, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 20% 40%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    75% {
+      background:
+        radial-gradient(circle at 40% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 40%, rgba(120, 119, 198, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 60% 60%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
+        linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+  }
+
+  /* Elegant floating particles */
+  .dream-particle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    animation: particle-drift 25s linear infinite;
+  }
+
+  @keyframes particle-drift {
+    0% {
+      transform: translateY(100vh) translateX(-10px) scale(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+      transform: translateY(90vh) translateX(0px) scale(1);
+    }
+    90% {
+      opacity: 1;
+      transform: translateY(10vh) translateX(10px) scale(1);
+    }
+    100% {
+      transform: translateY(-10vh) translateX(20px) scale(0);
+      opacity: 0;
+    }
+  }
+
+  /* Sophisticated text effects */
+  .text-elegant {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+  }
+
+  /* Refined floating animation */
+  .animate-elegant-float {
+    animation: elegant-float 8s ease-in-out infinite;
+  }
+
+  @keyframes elegant-float {
+    0%, 100% {
+      transform: translateY(0px) scale(1);
+    }
+    50% {
+      transform: translateY(-15px) scale(1.02);
+    }
+  }
+
+  /* Smooth entrance animation */
+  .animate-elegant-entrance {
+    animation: elegant-entrance 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(60px) scale(0.8);
+  }
+
+  @keyframes elegant-entrance {
+    0% {
+      opacity: 0;
+      transform: translateY(60px) scale(0.8);
+    }
+    60% {
+      opacity: 0.8;
+      transform: translateY(-10px) scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0px) scale(1);
+    }
+  }
+
+  /* Ambient light overlay */
+  .ambient-light {
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    animation: ambient-pulse 12s ease-in-out infinite;
+  }
+
+  @keyframes ambient-pulse {
+    0%, 100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.6;
     }
   }
 
