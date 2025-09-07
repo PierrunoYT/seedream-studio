@@ -7,7 +7,13 @@ export default function Home() {
       {/* Main content */}
       <main className="relative z-10 text-center px-8">
         <h1 className="text-6xl sm:text-8xl md:text-9xl font-extralight tracking-widest text-white drop-shadow-2xl">
-          Seedream Studio
+          Seedream{' '}
+          <span className="wave-letter">S</span>
+          <span className="wave-letter">t</span>
+          <span className="wave-letter">u</span>
+          <span className="wave-letter">d</span>
+          <span className="wave-letter">i</span>
+          <span className="wave-letter">o</span>
         </h1>
         <div className="mt-8 w-32 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent mx-auto"></div>
         <p className="mt-6 text-lg text-white/80 font-light tracking-wide">
