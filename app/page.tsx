@@ -2,10 +2,18 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="font-sans flex items-center justify-center min-h-screen relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800">
+    <div className="font-sans min-h-screen relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex items-center justify-center">
       
       {/* Main content */}
-      <main className="relative z-10 text-center px-8">
+      <main className="relative z-10 text-center px-8 flex flex-col items-center justify-center">
+        {/* Logo */}
+        <img
+          src="/logo.png"
+          alt="Seedream Studio Logo"
+          className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 mb-4 object-contain"
+        />
+        
+        {/* Title */}
         <h1 className="text-6xl sm:text-8xl md:text-9xl font-extralight tracking-widest text-white drop-shadow-2xl">
           Seedream{' '}
           <span className="wave-letter">S</span>
@@ -15,7 +23,11 @@ export default function Home() {
           <span className="wave-letter">i</span>
           <span className="wave-letter">o</span>
         </h1>
-        <div className="mt-8 w-32 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent mx-auto"></div>
+        
+        {/* Decorative line */}
+        <div className="mt-8 w-32 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
+        
+        {/* Tagline */}
         <p className="mt-6 text-lg text-white/80 font-light tracking-wide">
           Where Dreams Take Shape
         </p>
