@@ -37,9 +37,9 @@ export default function ProviderSelector({
   const getProviderDescription = (provider: ApiProviderType): string => {
     switch (provider) {
       case ApiProviderType.FAL:
-        return "Bytedance Seedream v4 via FAL AI";
+        return "Bytedance Seedream v4 via FAL AI - Generate 1-6 images per request";
       case ApiProviderType.WAVESPEED:
-        return "Bytedance Seedream v4 via WavespeedAI - State-of-art image generation with ultra-fast inference";
+        return "Bytedance Seedream v4 via WavespeedAI - Ultra-fast inference (1.8s for 2K images)";
       // Add other providers here
       default:
         return "";

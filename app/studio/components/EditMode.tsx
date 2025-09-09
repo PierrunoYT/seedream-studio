@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import SizeDropdown from "./SizeDropdown";
+import { ApiProviderType } from "../../../lib/api/types";
 
 interface EditModeProps {
   imageUrls: string[];
@@ -29,6 +30,7 @@ interface EditModeProps {
   onDrop: (e: React.DragEvent) => void;
   onFileSelect: (files: FileList) => void;
   onLoadExamples: () => void;
+  currentProvider: ApiProviderType;
 }
 
 const sizeOptions = [
@@ -45,6 +47,8 @@ const numImagesOptions = [
   { value: 2, label: "2 Images" },
   { value: 3, label: "3 Images" },
   { value: 4, label: "4 Images" },
+  { value: 5, label: "5 Images" },
+  { value: 6, label: "6 Images" },
 ];
 
 export default function EditMode({
@@ -71,7 +75,8 @@ export default function EditMode({
   onDragLeave,
   onDrop,
   onFileSelect,
-  onLoadExamples
+  onLoadExamples,
+  currentProvider
 }: EditModeProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selectedNumImagesOption = numImagesOptions.find(option => option.value === numImages);
@@ -196,51 +201,66 @@ export default function EditMode({
         />
       </div>
 
-      <div className="relative">
-        <label className="block text-white mb-2">Number of Images</label>
-        <button
-          type="button"
-          onClick={onToggleNumImagesDropdown}
-          className="w-full p-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white focus:outline-none focus:border-white/40 hover:bg-white/15 transition-all duration-200 cursor-pointer flex items-center justify-between"
-        >
-          <span>{selectedNumImagesOption?.label}</span>
-          <svg 
-            className={`w-4 h-4 transition-transform duration-200 ${isNumImagesDropdownOpen ? 'rotate-180' : ''}`}
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
+      {/* Only show Number of Images for providers that support it */}
+      {currentProvider !== ApiProviderType.WAVESPEED && (
+        <div className="relative">
+          <label className="block text-white mb-2">Number of Images</label>
+          <button
+            type="button"
+            onClick={onToggleNumImagesDropdown}
+            className="w-full p-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white focus:outline-none focus:border-white/40 hover:bg-white/15 transition-all duration-200 cursor-pointer flex items-center justify-between"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        
-        {isNumImagesDropdownOpen && (
-          <div 
-            className="absolute top-full left-0 right-0 mt-1 border border-white/20 rounded-lg overflow-hidden shadow-2xl"
-            style={{ 
-              zIndex: 10000,
-              position: 'absolute',
-              minWidth: '100%',
-              backgroundColor: 'rgba(88, 28, 135, 0.95)',
-              backdropFilter: 'blur(12px)'
-            }}
-          >
-            {numImagesOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => onNumImagesChange(option.value)}
-                className={`w-full p-3 text-left text-white hover:bg-white/20 transition-all duration-200 border-none ${
-                  numImages === option.value ? 'bg-white/25' : 'bg-transparent'
-                }`}
-                style={{ outline: 'none' }}
-              >
-                {option.label}
-              </button>
-            ))}
+            <span>{selectedNumImagesOption?.label}</span>
+            <svg 
+              className={`w-4 h-4 transition-transform duration-200 ${isNumImagesDropdownOpen ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {isNumImagesDropdownOpen && (
+            <div 
+              className="absolute top-full left-0 right-0 mt-1 border border-white/20 rounded-lg overflow-hidden shadow-2xl"
+              style={{ 
+                zIndex: 10000,
+                position: 'absolute',
+                minWidth: '100%',
+                backgroundColor: 'rgba(88, 28, 135, 0.95)',
+                backdropFilter: 'blur(12px)'
+              }}
+            >
+              {numImagesOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => onNumImagesChange(option.value)}
+                  className={`w-full p-3 text-left text-white hover:bg-white/20 transition-all duration-200 border-none ${
+                    numImages === option.value ? 'bg-white/25' : 'bg-transparent'
+                  }`}
+                  style={{ outline: 'none' }}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Show notice for WavespeedAI that it only generates 1 image */}
+      {currentProvider === ApiProviderType.WAVESPEED && (
+        <div className="bg-white/5 border border-white/10 rounded-lg p-3">
+          <div className="flex items-center text-white/70">
+            <svg className="w-4 h-4 mr-2 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-sm">WavespeedAI generates 1 image per request</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <SizeDropdown
         value={size}

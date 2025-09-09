@@ -1,20 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { ApiProviderType } from "../../../lib/api/types";
 
 interface ApiKeySectionProps {
   apiKey: string;
   onApiKeyChange: (value: string) => void;
   onClearApiKey: () => void;
+  currentProvider: ApiProviderType;
 }
 
-export default function ApiKeySection({ apiKey, onApiKeyChange, onClearApiKey }: ApiKeySectionProps) {
+export default function ApiKeySection({ apiKey, onApiKeyChange, onClearApiKey, currentProvider }: ApiKeySectionProps) {
   const [showApiKeyInfo, setShowApiKeyInfo] = useState(false);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <label className="block text-white">FAL API Key</label>
+        <label className="block text-white">
+          {currentProvider === ApiProviderType.WAVESPEED ? 'WavespeedAI API Key' : 'FAL API Key'}
+        </label>
         <div className="flex items-center space-x-2">
           <button
             type="button"
@@ -61,7 +65,7 @@ export default function ApiKeySection({ apiKey, onApiKeyChange, onClearApiKey }:
           type="password"
           value={apiKey}
           onChange={(e) => onApiKeyChange(e.target.value)}
-          placeholder="Your FAL API Key"
+          placeholder={currentProvider === ApiProviderType.WAVESPEED ? 'Your WavespeedAI API Key' : 'Your FAL API Key'}
           className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-white/40 pr-12"
         />
         {apiKey && (

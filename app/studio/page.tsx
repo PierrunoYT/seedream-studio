@@ -12,6 +12,7 @@ import { useApiKey } from "./hooks/useApiKey";
 import { useImageHistory } from "./hooks/useImageHistory";
 import { useImageGeneration } from "./hooks/useImageGeneration";
 import { ApiProviderType } from "../../lib/api/types";
+import { ApiProviderFactory } from "../../lib/api/factory";
 
 export default function Studio() {
   const [prompt, setPrompt] = useState("Dress the model in the clothes and shoes.");
@@ -44,7 +45,7 @@ export default function Studio() {
   } = useImageGeneration({
     apiKey,
     onSaveImage: saveImageToHistory,
-    provider: ApiProviderType.FAL
+    provider: ApiProviderFactory.getAvailableProviders()[0]
   });
 
   // Use image for editing
@@ -190,7 +191,9 @@ export default function Studio() {
             </svg>
             Back to Home
           </Link>
-          <h1 className="text-4xl font-light text-white">Seedream Studio</h1>
+          <h1 className="text-4xl font-light text-white">
+            {currentProvider === ApiProviderType.WAVESPEED ? 'WavespeedAI Studio' : 'Seedream Studio'}
+          </h1>
           <div className="w-32"></div>
         </div>
         
@@ -221,10 +224,51 @@ export default function Studio() {
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 space-y-6 relative" suppressHydrationWarning>
+          {/* Provider-specific information banner */}
+          <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
+                  {currentProvider === ApiProviderType.WAVESPEED ? (
+                    <span className="text-2xl">⚡</span>
+                  ) : (
+                    <span className="text-2xl">🎨</span>
+                  )}
+                </div>
+              </div>
+              <div className="flex-1 text-white">
+                <h3 className="text-lg font-medium mb-2">
+                  {currentProvider === ApiProviderType.WAVESPEED 
+                    ? 'Seedream 4.0 via WavespeedAI' 
+                    : 'Seedream 4.0 via FAL AI'
+                  }
+                </h3>
+                <div className="text-sm text-white/80 space-y-1">
+                  {currentProvider === ApiProviderType.WAVESPEED ? (
+                    <>
+                      <p>• Ultra-fast inference: Generate 2K images in just 1.8 seconds</p>
+                      <p>• Single image generation (1 image per request)</p>
+                      <p>• Precise instruction editing with high feature retention</p>
+                      <p>• Size formats: Custom dimensions (width*height) from 1024x1024 to 4096x4096</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>• Multiple image generation (1-6 images per request)</p>
+                      <p>• Supports text-to-image and image editing modes</p>
+                      <p>• File upload support for image editing operations</p>
+                      <p>• Flexible sizing: Objects with width/height or preset enums</p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <ApiKeySection 
             apiKey={apiKey}
             onApiKeyChange={handleApiKeyChange}
             onClearApiKey={clearApiKey}
+            currentProvider={currentProvider}
           />
 
           <ProviderSelector
@@ -242,20 +286,43 @@ export default function Studio() {
           />
 
           {activeMode === 'generate' && (
-            <GenerateMode 
-              prompt={generatePrompt}
-              onPromptChange={setGeneratePrompt}
-              numImages={numImages}
-              onNumImagesChange={handleNumImagesSelect}
-              isNumImagesDropdownOpen={isNumImagesDropdownOpen}
-              onToggleNumImagesDropdown={() => setIsNumImagesDropdownOpen(!isNumImagesDropdownOpen)}
-              size={size}
-              onSizeChange={handleSizeSelect}
-              isSizeDropdownOpen={isDropdownOpen}
-              onToggleSizeDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
-              seed={seed}
-              onSeedChange={setSeed}
-            />
+            <>
+              {/* Provider-specific prompt writing guide */}
+              {currentProvider === ApiProviderType.WAVESPEED && (
+                <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                  <h4 className="text-white font-medium mb-3 flex items-center">
+                    <span className="text-lg mr-2">📝</span>
+                    WavespeedAI Prompt Writing Guide
+                  </h4>
+                  <div className="text-sm text-white/70 space-y-2">
+                    <p><span className="text-white/90 font-medium">Formula:</span> Use "change action + change object + target feature" for best results</p>
+                    <p><span className="text-white/90 font-medium">Group images:</span> Use "a series of" or "group of images" to maintain consistency</p>
+                    <p><span className="text-white/90 font-medium">Professional terms:</span> Use original language vocabulary and special image terms</p>
+                    <div className="mt-3 p-2 bg-white/5 rounded text-xs">
+                      <p className="text-white/60 mb-1">Example prompts:</p>
+                      <p>"A series of anime characters in different poses, vibrant colors, studio lighting"</p>
+                      <p>"Commercial poster design, minimalist style, brand clothing showcase, high-end fashion"</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <GenerateMode 
+                prompt={generatePrompt}
+                onPromptChange={setGeneratePrompt}
+                numImages={numImages}
+                onNumImagesChange={handleNumImagesSelect}
+                isNumImagesDropdownOpen={isNumImagesDropdownOpen}
+                onToggleNumImagesDropdown={() => setIsNumImagesDropdownOpen(!isNumImagesDropdownOpen)}
+                size={size}
+                onSizeChange={handleSizeSelect}
+                isSizeDropdownOpen={isDropdownOpen}
+                onToggleSizeDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
+                seed={seed}
+                onSeedChange={setSeed}
+                currentProvider={currentProvider}
+              />
+            </>
           )}
 
           {activeMode === 'edit' && (
@@ -284,6 +351,7 @@ export default function Studio() {
               onDrop={handleDrop}
               onFileSelect={handleFileSelect}
               onLoadExamples={loadExamples}
+              currentProvider={currentProvider}
             />
           )}
 
