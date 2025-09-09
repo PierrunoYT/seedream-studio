@@ -12,7 +12,7 @@ export default function Studio() {
             <div className="text-6xl mb-4">🚧</div>
             <h1 className="text-3xl font-light text-white mb-4">Coming Soon!</h1>
             <p className="text-white/80 text-lg mb-6">
-              Seedream Studio is currently under development. We're working hard to bring you an amazing AI image generation experience.
+              Seedream Studio is currently under development. We&apos;re working hard to bring you an amazing AI image generation experience.
             </p>
             <div className="text-white/60 text-sm mb-6">
               Stay tuned for updates!

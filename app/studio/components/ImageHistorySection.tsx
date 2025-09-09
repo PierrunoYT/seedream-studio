@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface SavedImage {
   url: string;
@@ -72,12 +73,12 @@ export default function ImageHistorySection({
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-64 overflow-y-auto">
             {savedImages.map((image) => (
               <div key={image.timestamp} className="relative group">
-                <div className="aspect-square rounded-lg overflow-hidden bg-white/5 border border-white/10">
-                  <img 
+                <div className="aspect-square rounded-lg overflow-hidden bg-white/5 border border-white/10 cursor-pointer" onClick={() => onSetResultUrl(image.url)}>
+                  <Image
                     src={image.url} 
                     alt={`${image.mode} image`}
-                    className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-200"
-                    onClick={() => onSetResultUrl(image.url)}
+                    fill
+                    className="object-cover hover:scale-105 transition-transform duration-200"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}

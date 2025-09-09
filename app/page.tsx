@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Home() {
   const [showComingSoon, setShowComingSoon] = useState(false);
@@ -18,9 +19,11 @@ export default function Home() {
       <main className="relative z-10 text-center px-8 flex flex-col items-center justify-center">
         {/* Logo */}
         <div className="logo-container mb-4">
-          <img
+          <Image
             src="/logo.png"
             alt="Seedream Studio Logo"
+            width={112}
+            height={112}
             className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain animate-logo cursor-pointer"
           />
         </div>

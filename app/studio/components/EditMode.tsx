@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import SizeDropdown from "./SizeDropdown";
 
 interface EditModeProps {
@@ -141,14 +142,17 @@ export default function EditMode({
               <p className="text-white/70 text-sm">Images to edit ({imageUrls.length}):</p>
               {imageUrls.map((url, index) => (
                 <div key={index} className="flex items-center gap-2 p-2 bg-white/5 rounded-lg border border-white/10">
-                  <img 
-                    src={url} 
-                    alt={`Input ${index + 1}`} 
-                    className="w-12 h-12 object-cover rounded"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
+                  <div className="relative w-12 h-12 rounded overflow-hidden">
+                    <Image
+                      src={url} 
+                      alt={`Input ${index + 1}`} 
+                      fill
+                      className="object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
                   <span className="flex-1 text-white/80 text-sm truncate">{url}</span>
                   <button
                     type="button"

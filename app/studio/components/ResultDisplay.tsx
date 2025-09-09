@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 interface ResultDisplayProps {
   resultUrl: string;
   onUseImageForEditing: (imageUrl: string) => void;
@@ -10,11 +12,15 @@ export default function ResultDisplay({ resultUrl, onUseImageForEditing }: Resul
 
   return (
     <div className="text-center">
-      <img
-        src={resultUrl}
-        alt="Generated image"
-        className="max-w-full h-auto rounded-lg mx-auto"
-      />
+      <div className="relative inline-block max-w-full">
+        <Image
+          src={resultUrl}
+          alt="Generated image"
+          width={1024}
+          height={1024}
+          className="max-w-full h-auto rounded-lg mx-auto"
+        />
+      </div>
       <div className="flex flex-wrap justify-center gap-3 mt-4">
         <a
           href={resultUrl}
