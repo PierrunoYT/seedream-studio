@@ -21,7 +21,7 @@ export const PROVIDER_CONFIGS: Record<ApiProviderType, ProviderConfig> = {
   [ApiProviderType.FAL]: {
     name: 'fal',
     displayName: 'FAL AI',
-    description: 'Bytedance Seedream v4 via FAL AI - Fast and reliable image generation',
+    description: 'Bytedance Seedream v4 via FAL AI - Generate 1-6 images per request',
     supportsTextToImage: true,
     supportsImageEdit: true,
     supportsFileUpload: true,
