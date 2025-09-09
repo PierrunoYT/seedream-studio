@@ -35,11 +35,11 @@ interface EditModeProps {
 
 const sizeOptions = [
   { value: "square_hd", label: "Square HD (1024x1024)" },
-  { value: "square", label: "Square (512x512)" },
   { value: "portrait_4_3", label: "Portrait 4:3" },
   { value: "portrait_16_9", label: "Portrait 16:9" },
   { value: "landscape_4_3", label: "Landscape 4:3" },
   { value: "landscape_16_9", label: "Landscape 16:9" },
+  { value: "custom", label: "Custom" },
 ];
 
 const getNumImagesOptions = (provider: ApiProviderType) => {
@@ -119,11 +119,13 @@ export default function EditMode({
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all duration-200 ${
-              isDragging 
-                ? 'border-white/60 bg-white/10' 
-                : 'border-white/30 bg-white/5 hover:border-white/50 hover:bg-white/8'
+            onClick={() => imageUrls.length < 10 && fileInputRef.current?.click()}
+            className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 ${
+              imageUrls.length >= 10
+                ? 'border-white/20 bg-white/5 cursor-not-allowed'
+                : isDragging
+                ? 'border-white/60 bg-white/10 cursor-copy'
+                : 'border-white/30 bg-white/5 hover:border-white/50 hover:bg-white/8 cursor-pointer'
             }`}
           >
             <input
@@ -133,6 +135,7 @@ export default function EditMode({
               accept="image/*"
               onChange={(e) => e.target.files && onFileSelect(e.target.files)}
               className="hidden"
+              disabled={imageUrls.length >= 10}
             />
             <div className="flex flex-col items-center space-y-2">
               <svg className="w-8 h-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,10 +152,15 @@ export default function EditMode({
                   </span>
                 ) : isDragging ? (
                   "Drop your images here"
+                ) : imageUrls.length >= 10 ? (
+                  <>
+                    <p className="text-sm font-medium text-red-400">Maximum 10 images reached</p>
+                    <p className="text-xs text-white/50">Remove an image to add new ones</p>
+                  </>
                 ) : (
                   <>
                     <p className="text-sm font-medium">Drop images here or click to browse</p>
-                    <p className="text-xs text-white/50">Supports JPG, PNG, WebP and more</p>
+                    <p className="text-xs text-white/50">Up to {10 - imageUrls.length} more images</p>
                   </>
                 )}
               </div>
@@ -165,12 +173,13 @@ export default function EditMode({
               value={newImageUrl}
               onChange={(e) => onNewImageUrlChange(e.target.value)}
               placeholder="Or paste image URL here..."
-              className="flex-1 p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-white/40"
+              className="flex-1 p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-white/40 disabled:opacity-50"
+              disabled={imageUrls.length >= 10}
             />
             <button
               type="button"
               onClick={onAddImageUrl}
-              disabled={!newImageUrl.trim()}
+              disabled={!newImageUrl.trim() || imageUrls.length >= 10}
               className="px-4 py-3 bg-white/20 hover:bg-white/30 disabled:bg-white/10 border border-white/20 rounded-lg text-white font-light transition-all duration-300 backdrop-blur-sm disabled:cursor-not-allowed"
             >
               Add URL
@@ -179,7 +188,7 @@ export default function EditMode({
           
           {imageUrls.length > 0 && (
             <div className="space-y-2">
-              <p className="text-white/70 text-sm">Images to edit ({imageUrls.length}):</p>
+              <p className="text-white/70 text-sm">Images to edit ({imageUrls.length}/10):</p>
               {imageUrls.map((url, index) => (
                 <div key={index} className="flex items-center gap-2 p-2 bg-white/5 rounded-lg border border-white/10">
                   <div className="relative w-12 h-12 rounded overflow-hidden">
