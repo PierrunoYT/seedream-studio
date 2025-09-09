@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 
 export default function Studio() {
   const [apiKey, setApiKey] = useState("");
@@ -10,6 +11,35 @@ export default function Studio() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [status, setStatus] = useState("");
   const [resultUrl, setResultUrl] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const sizeOptions = [
+    { value: "512*512", label: "512x512" },
+    { value: "768*768", label: "768x768" },
+    { value: "1024*1024", label: "1024x1024" },
+    { value: "1024*1536", label: "1024x1536 (Portrait)" },
+    { value: "1536*1024", label: "1536x1024 (Landscape)" },
+    { value: "2048*2048", label: "2048x2048" },
+  ];
+
+  const selectedOption = sizeOptions.find(option => option.value === size);
+
+  const handleSizeSelect = (value: string) => {
+    setSize(value);
+    setIsDropdownOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const runModel = async () => {
     if (!apiKey) {
@@ -91,9 +121,26 @@ export default function Studio() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-light text-white text-center mb-8">Seedream Studio</h1>
+        <div className="flex items-center justify-between mb-8">
+          <Link 
+            href="/" 
+            className="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white font-light transition-all duration-300 backdrop-blur-sm group"
+          >
+            <svg 
+              className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform duration-200" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Home
+          </Link>
+          <h1 className="text-4xl font-light text-white">Seedream Studio</h1>
+          <div className="w-32"></div>
+        </div>
         
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 space-y-6">
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 space-y-6 relative">
           <div>
             <label className="block text-white mb-2">API Key</label>
             <input
@@ -115,24 +162,50 @@ export default function Studio() {
             />
           </div>
 
-          <div>
+          <div className="relative" ref={dropdownRef}>
             <label className="block text-white mb-2">Size</label>
-            <select
-              value={size}
-              onChange={(e) => setSize(e.target.value)}
-              className="w-full p-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white focus:outline-none focus:border-white/40 hover:bg-white/15 transition-all duration-200 cursor-pointer appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xIDFMNiA2TDExIDEiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==')] bg-no-repeat bg-right bg-[center_right_12px] pr-10"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(8px)'
-              }}
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full p-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white focus:outline-none focus:border-white/40 hover:bg-white/15 transition-all duration-200 cursor-pointer flex items-center justify-between"
             >
-              <option value="512*512" style={{ backgroundColor: 'rgba(88, 28, 135, 0.95)', color: 'white' }}>512x512</option>
-              <option value="768*768" style={{ backgroundColor: 'rgba(88, 28, 135, 0.95)', color: 'white' }}>768x768</option>
-              <option value="1024*1024" style={{ backgroundColor: 'rgba(88, 28, 135, 0.95)', color: 'white' }}>1024x1024</option>
-              <option value="1024*1536" style={{ backgroundColor: 'rgba(88, 28, 135, 0.95)', color: 'white' }}>1024x1536 (Portrait)</option>
-              <option value="1536*1024" style={{ backgroundColor: 'rgba(88, 28, 135, 0.95)', color: 'white' }}>1536x1024 (Landscape)</option>
-              <option value="2048*2048" style={{ backgroundColor: 'rgba(88, 28, 135, 0.95)', color: 'white' }}>2048x2048</option>
-            </select>
+              <span>{selectedOption?.label}</span>
+              <svg 
+                className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {isDropdownOpen && (
+              <div 
+                className="absolute top-full left-0 right-0 mt-1 border border-white/20 rounded-lg overflow-hidden shadow-2xl"
+                style={{ 
+                  zIndex: 10000,
+                  position: 'absolute',
+                  minWidth: '100%',
+                  backgroundColor: 'rgba(88, 28, 135, 0.95)',
+                  backdropFilter: 'blur(12px)'
+                }}
+              >
+                {sizeOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => handleSizeSelect(option.value)}
+                    className={`w-full p-3 text-left text-white hover:bg-white/20 transition-all duration-200 border-none ${
+                      size === option.value ? 'bg-white/25' : 'bg-transparent'
+                    }`}
+                    style={{ outline: 'none' }}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
