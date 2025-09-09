@@ -27,8 +27,6 @@ export default function ProviderSelector({
       //   return "Replicate";
       // case ApiProviderType.OPENAI:
       //   return "OpenAI DALL-E";
-      default:
-        return provider.toUpperCase();
     }
   };
 

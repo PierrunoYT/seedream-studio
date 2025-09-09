@@ -10,6 +10,36 @@ import {
   CustomImageSize
 } from "../types";
 
+// FAL API response types
+interface FALImage {
+  url: string;
+  width?: number;
+  height?: number;
+  content_type?: string;
+  file_name?: string;
+  file_size?: number;
+}
+
+interface FALResponse {
+  images: FALImage[];
+  seed?: number;
+}
+
+interface FALResult {
+  data: FALResponse;
+  requestId: string;
+}
+
+interface FALQueueStatus {
+  status: string;
+  logs?: { message: string }[];
+  progress?: number;
+}
+
+interface FALLog {
+  message: string;
+}
+
 export class FALProvider extends ApiProvider {
   constructor(config: ApiConfig) {
     super(config);
@@ -44,13 +74,13 @@ export class FALProvider extends ApiProvider {
         logs: true,
         onQueueUpdate: (update) => {
           if (update.status === "IN_PROGRESS") {
-            update.logs?.map((log) => log.message).forEach(console.log);
+            update.logs?.map((log: FALLog) => log.message).forEach(console.log);
           }
         },
-      });
+      }) as FALResult;
 
       return {
-        images: result.data.images.map((img: any) => ({
+        images: result.data.images.map((img: FALImage) => ({
           url: img.url,
           width: img.width,
           height: img.height,
@@ -86,13 +116,13 @@ export class FALProvider extends ApiProvider {
         logs: true,
         onQueueUpdate: (update) => {
           if (update.status === "IN_PROGRESS") {
-            update.logs?.map((log) => log.message).forEach(console.log);
+            update.logs?.map((log: FALLog) => log.message).forEach(console.log);
           }
         },
-      });
+      }) as FALResult;
 
       return {
-        images: result.data.images.map((img: any) => ({
+        images: result.data.images.map((img: FALImage) => ({
           url: img.url,
           width: img.width,
           height: img.height,
@@ -138,8 +168,8 @@ export class FALProvider extends ApiProvider {
 
       return {
         status: status.status as QueueStatus['status'],
-        logs: status.logs?.map((log: any) => log.message) || [],
-        progress: status.progress
+        logs: (status as FALQueueStatus).logs?.map((log: FALLog) => log.message) || [],
+        progress: (status as FALQueueStatus).progress
       };
     } catch (error) {
       console.error('FAL Queue Status Error:', error);
@@ -151,10 +181,10 @@ export class FALProvider extends ApiProvider {
     try {
       const result = await fal.queue.result("fal-ai/bytedance/seedream/v4/text-to-image", {
         requestId
-      });
+      }) as FALResult;
 
       return {
-        images: result.data.images.map((img: any) => ({
+        images: result.data.images.map((img: FALImage) => ({
           url: img.url,
           width: img.width,
           height: img.height,

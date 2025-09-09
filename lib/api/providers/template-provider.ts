@@ -72,23 +72,27 @@ export class TemplateProvider extends ApiProvider {
   }
 
   // Optional: Implement queue methods if your provider supports them
-  async submitGeneration(request: ImageGenerationRequest): Promise<{ requestId: string }> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async submitGeneration(_request: ImageGenerationRequest): Promise<{ requestId: string }> {
     // Implement if your provider supports async job submission
     throw new Error('Queue operations not supported by this provider');
   }
 
-  async getQueueStatus(requestId: string): Promise<QueueStatus> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getQueueStatus(_requestId: string): Promise<QueueStatus> {
     // Implement if your provider supports queue status checking
     throw new Error('Queue operations not supported by this provider');
   }
 
-  async getResult(requestId: string): Promise<ImageGenerationResponse> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getResult(_requestId: string): Promise<ImageGenerationResponse> {
     // Implement if your provider supports result retrieval
     throw new Error('Queue operations not supported by this provider');
   }
 
   // Optional: Implement file upload if your provider supports it
-  async uploadFile(file: File): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async uploadFile(_file: File): Promise<string> {
     // Implement file upload to your provider's storage
     // Return the public URL of the uploaded file
     throw new Error('File upload not supported by this provider');

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import ApiKeySection from "./components/ApiKeySection";
 import ImageHistorySection from "./components/ImageHistorySection";
@@ -26,7 +26,6 @@ export default function Studio() {
   const [generatePrompt, setGeneratePrompt] = useState("Draw a chart showing the typical vegetation distribution in four different climate zones: tropical rainforest, temperate forest, desert, and tundra.");
   const [numImages, setNumImages] = useState(1);
   const [isNumImagesDropdownOpen, setIsNumImagesDropdownOpen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Custom hooks
   const { apiKey, handleApiKeyChange, clearApiKey } = useApiKey();

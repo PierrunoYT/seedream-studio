@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { SeedreamApiClient } from "../../../lib/api/client";
-import { ApiProviderType } from "../../../lib/api/types";
+import { ApiProviderType, ImageSize, CustomImageSize } from "../../../lib/api/types";
 
 interface UseImageGenerationProps {
   apiKey: string;
@@ -24,6 +24,35 @@ export function useImageGeneration({
     return new SeedreamApiClient(providerType, { apiKey });
   };
 
+  const validateImageSize = (size: string): ImageSize | CustomImageSize => {
+    // Check if it's a valid ImageSize string
+    const validSizes: ImageSize[] = [
+      'square_hd', 
+      'square', 
+      'portrait_4_3', 
+      'portrait_16_9', 
+      'landscape_4_3', 
+      'landscape_16_9'
+    ];
+    
+    if (validSizes.includes(size as ImageSize)) {
+      return size as ImageSize;
+    }
+    
+    // If not a valid ImageSize, try to parse as custom dimensions
+    try {
+      const [width, height] = size.split('x').map(Number);
+      if (width && height) {
+        return { width, height };
+      }
+    } catch {
+      // Fall through to default
+    }
+    
+    // Default to square if parsing fails
+    return 'square';
+  };
+
   const runGenerateModel = async (prompt: string, size: string, numImages: number, seed?: string) => {
     if (!apiKey) {
       setStatus("Your API Key is not set");
@@ -39,7 +68,7 @@ export function useImageGeneration({
       
       const result = await client.generateImage({
         prompt,
-        imageSize: size as any, // Type assertion for now, you might want to improve this
+        imageSize: validateImageSize(size),
         numImages,
         seed: seed ? parseInt(seed) : undefined
       });
@@ -81,7 +110,7 @@ export function useImageGeneration({
       const result = await client.editImage({
         prompt,
         imageUrls,
-        imageSize: size as any, // Type assertion for now
+        imageSize: validateImageSize(size),
         numImages: numImages || 1,
         seed: seed ? parseInt(seed) : undefined
       });
