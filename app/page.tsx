@@ -3,6 +3,7 @@ import Image from "next/image";
 export default function Home() {
   return (
     <div className="font-sans min-h-screen relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex items-center justify-center">
+
       
       {/* Main content */}
       <main className="relative z-10 text-center px-8 flex flex-col items-center justify-center">
@@ -17,22 +18,22 @@ export default function Home() {
         
         {/* Title */}
 
-        <h1 className="text-6xl sm:text-8xl md:text-9xl font-extralight tracking-widest text-white drop-shadow-2xl">
-          <span className="wave-letter">S</span>
-          <span className="wave-letter">e</span>
-          <span className="wave-letter">e</span>
-          <span className="wave-letter">d</span>
-          <span className="wave-letter">r</span>
-          <span className="wave-letter">e</span>
-          <span className="wave-letter">a</span>
-          <span className="wave-letter">m</span>
-          <span className="wave-letter mx-4"> </span>
-          <span className="wave-letter">S</span>
-          <span className="wave-letter">t</span>
-          <span className="wave-letter">u</span>
-          <span className="wave-letter">d</span>
-          <span className="wave-letter">i</span>
-          <span className="wave-letter">o</span>
+        <h1 className="text-6xl sm:text-8xl md:text-9xl font-extralight tracking-widest text-white drop-shadow-2xl">
+          <span className="wave-letter">S</span>
+          <span className="wave-letter">e</span>
+          <span className="wave-letter">e</span>
+          <span className="wave-letter">d</span>
+          <span className="wave-letter">r</span>
+          <span className="wave-letter">e</span>
+          <span className="wave-letter">a</span>
+          <span className="wave-letter">m</span>
+          <span className="wave-letter mx-4"> </span>
+          <span className="wave-letter">S</span>
+          <span className="wave-letter">t</span>
+          <span className="wave-letter">u</span>
+          <span className="wave-letter">d</span>
+          <span className="wave-letter">i</span>
+          <span className="wave-letter">o</span>
         </h1>
         
         {/* Decorative line */}
