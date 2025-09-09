@@ -24,7 +24,11 @@ export function useImageGeneration({
     return new SeedreamApiClient(providerType, { apiKey });
   };
 
-  const validateImageSize = (size: string): ImageSize | CustomImageSize => {
+  const validateImageSize = (size: string | CustomImageSize): ImageSize | CustomImageSize => {
+    // If it's already a CustomImageSize object, return as is
+    if (typeof size === 'object' && 'width' in size && 'height' in size) {
+      return size;
+    }
     // Check if it's a valid ImageSize string
     const validSizes: ImageSize[] = [
       'square_hd', 
@@ -39,9 +43,9 @@ export function useImageGeneration({
       return size as ImageSize;
     }
     
-    // If not a valid ImageSize, try to parse as custom dimensions
+    // If not a valid ImageSize, try to parse as custom dimensions (for string input)
     try {
-      const [width, height] = size.split('x').map(Number);
+      const [width, height] = (size as string).split('x').map(Number);
       if (width && height) {
         return { width, height };
       }
@@ -53,7 +57,7 @@ export function useImageGeneration({
     return 'square';
   };
 
-  const runGenerateModel = async (prompt: string, size: string, numImages: number, seed?: string) => {
+  const runGenerateModel = async (prompt: string, size: string | CustomImageSize, numImages: number, seed?: string) => {
     if (!apiKey) {
       setStatus("Your API Key is not set");
       return;
@@ -89,7 +93,7 @@ export function useImageGeneration({
     }
   };
 
-  const runEditModel = async (prompt: string, imageUrls: string[], size: string, seed?: string, numImages?: number) => {
+  const runEditModel = async (prompt: string, imageUrls: string[], size: string | CustomImageSize, seed?: string, numImages?: number) => {
     if (!apiKey) {
       setStatus("Your API Key is not set");
       return;
@@ -135,7 +139,7 @@ export function useImageGeneration({
     setCurrentProvider(newProvider);
   };
 
-  const runSequentialEdit = async (prompt: string, imageUrls: string[], size: string, maxImages: number, seed?: string) => {
+  const runSequentialEdit = async (prompt: string, imageUrls: string[], size: string | CustomImageSize, maxImages: number, seed?: string) => {
     if (!apiKey) {
       setStatus("Your API Key is not set");
       return;
@@ -178,7 +182,7 @@ export function useImageGeneration({
     }
   };
 
-  const runSequentialGenerate = async (prompt: string, size: string, maxImages: number, seed?: string) => {
+  const runSequentialGenerate = async (prompt: string, size: string | CustomImageSize, maxImages: number, seed?: string) => {
     if (!apiKey) {
       setStatus("Your API Key is not set");
       return;
