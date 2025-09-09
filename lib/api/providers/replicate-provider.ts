@@ -20,6 +20,13 @@ interface ReplicateParams {
   sequential_image_generation?: "disabled" | "auto";
 }
 
+// Replicate output types
+interface ReplicateOutputItem {
+  url(): string;
+}
+
+type ReplicateOutput = string | ReplicateOutputItem;
+
 export class ReplicateProvider extends ApiProvider {
   private replicate: Replicate;
 
@@ -66,7 +73,7 @@ export class ReplicateProvider extends ApiProvider {
         const config = sizeAspectMap[request.imageSize as string];
         if (config) {
           params.size = config.size;
-          params.aspect_ratio = config.aspect as any;
+          params.aspect_ratio = config.aspect as ReplicateParams['aspect_ratio'];
         } else {
           params.size = "2K";
           params.aspect_ratio = "1:1";
@@ -99,7 +106,7 @@ export class ReplicateProvider extends ApiProvider {
       }
 
       return {
-        images: output.map((item: any) => ({
+        images: output.map((item: ReplicateOutput) => ({
           url: typeof item === 'string' ? item : item.url(),
         })),
         seed: request.seed,
@@ -128,7 +135,7 @@ export class ReplicateProvider extends ApiProvider {
       }
 
       return {
-        images: output.map((item: any) => ({
+        images: output.map((item: ReplicateOutput) => ({
           url: typeof item === 'string' ? item : item.url(),
         })),
         seed: request.seed,
