@@ -7,8 +7,6 @@ import {
   ImageEditRequest,
   ImageGenerationResponse,
   QueueStatus,
-  ImageSize,
-  CustomImageSize,
 } from "../types";
 
 interface ReplicateParams {

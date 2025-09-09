@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import SizeDropdown from "./SizeDropdown";
-import { ApiProviderType } from "../../../lib/api/types";
+import { ApiProviderType, CustomImageSize } from "../../../lib/api/types";
 
 interface EditModeProps {
   imageUrls: string[];
@@ -17,8 +17,8 @@ interface EditModeProps {
   onNumImagesChange: (value: number) => void;
   isNumImagesDropdownOpen: boolean;
   onToggleNumImagesDropdown: () => void;
-  size: string;
-  onSizeChange: (value: string) => void;
+  size: string | CustomImageSize;
+  onSizeChange: (value: string | CustomImageSize) => void;
   isSizeDropdownOpen: boolean;
   onToggleSizeDropdown: () => void;
   seed: string;
