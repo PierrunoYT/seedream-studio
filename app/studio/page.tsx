@@ -287,6 +287,8 @@ export default function Studio() {
                 <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
                   {currentProvider === ApiProviderType.WAVESPEED ? (
                     <span className="text-2xl">⚡</span>
+                  ) : currentProvider === ApiProviderType.REPLICATE ? (
+                    <span className="text-2xl">🔄</span>
                   ) : (
                     <span className="text-2xl">🎨</span>
                   )}
@@ -296,6 +298,8 @@ export default function Studio() {
                 <h3 className="text-lg font-medium mb-2">
                   {currentProvider === ApiProviderType.WAVESPEED 
                     ? 'Seedream 4.0 via WavespeedAI' 
+                    : currentProvider === ApiProviderType.REPLICATE
+                    ? 'Seedream 4.0 via Replicate'
                     : 'Seedream 4.0 via FAL AI'
                   }
                 </h3>
@@ -306,6 +310,13 @@ export default function Studio() {
                       <p>• Single image generation (1 image per request)</p>
                       <p>• Supports text-to-image and image editing modes</p>
                       <p>• Base64 image support for editing operations</p>
+                    </>
+                  ) : currentProvider === ApiProviderType.REPLICATE ? (
+                    <>
+                      <p>• Multiple image generation (1-15 images per request)</p>
+                      <p>• Sequential generation support for batch processing</p>
+                      <p>• Supports text-to-image and image editing modes</p>
+                      <p>• Flexible aspect ratio and custom sizing options</p>
                     </>
                   ) : (
                     <>
