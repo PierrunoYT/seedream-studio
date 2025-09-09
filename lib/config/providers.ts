@@ -40,7 +40,7 @@ export const PROVIDER_CONFIGS: Record<ApiProviderType, ProviderConfig> = {
     description: 'Bytedance Seedream v4 via WavespeedAI - State-of-art image generation with ultra-fast inference',
     supportsTextToImage: true,
     supportsImageEdit: true,
-    supportsFileUpload: false,
+    supportsFileUpload: true,
     supportsQueue: true,
     apiKeyRequired: true,
     maxImageSize: { width: 4096, height: 4096 },
@@ -50,17 +50,22 @@ export const PROVIDER_CONFIGS: Record<ApiProviderType, ProviderConfig> = {
       imageEdit: 'Variable pricing'
     }
   },
-  // Add configurations for other providers here
-  // [ApiProviderType.REPLICATE]: {
-  //   name: 'replicate',
-  //   displayName: 'Replicate',
-  //   description: 'Various models available on Replicate platform',
-  //   supportsTextToImage: true,
-  //   supportsImageEdit: false,
-  //   supportsFileUpload: true,
-  //   supportsQueue: true,
-  //   apiKeyRequired: true,
-  // },
+  [ApiProviderType.REPLICATE]: {
+    name: 'replicate',
+    displayName: 'Replicate',
+    description: 'Bytedance Seedream v4 via Replicate - Generate up to 15 images with sequential generation support',
+    supportsTextToImage: true,
+    supportsImageEdit: true,
+    supportsFileUpload: true,
+    supportsQueue: true,
+    apiKeyRequired: true,
+    maxImageSize: { width: 4096, height: 4096 },
+    supportedFormats: ['JPEG', 'PNG', 'WebP'],
+    pricing: {
+      textToImage: '$0.055 per image',
+      imageEdit: '$0.055 per image'
+    }
+  },
 };
 
 export function getProviderConfig(provider: ApiProviderType): ProviderConfig {

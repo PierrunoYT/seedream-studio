@@ -24,11 +24,8 @@ export default function ProviderSelector({
         return "FAL AI";
       case ApiProviderType.WAVESPEED:
         return "WavespeedAI";
-      // Add other providers here
-      // case ApiProviderType.REPLICATE:
-      //   return "Replicate";
-      // case ApiProviderType.OPENAI:
-      //   return "OpenAI DALL-E";
+      case ApiProviderType.REPLICATE:
+        return "Replicate";
       default:
         return provider;
     }
@@ -40,7 +37,8 @@ export default function ProviderSelector({
         return "Bytedance Seedream v4 via FAL AI - Generate 1-6 images per request";
       case ApiProviderType.WAVESPEED:
         return "Bytedance Seedream v4 via WavespeedAI - Ultra-fast inference (1.8s for 2K images)";
-      // Add other providers here
+      case ApiProviderType.REPLICATE:
+        return "Bytedance Seedream v4 via Replicate - Generate up to 15 images with sequential generation support";
       default:
         return "";
     }
@@ -51,10 +49,10 @@ export default function ProviderSelector({
     setIsOpen(false);
   };
 
-  if (availableProviders.length <= 1) {
-    // Don't show selector if there's only one provider
-    return null;
-  }
+  // Always show provider selector to allow switching between FAL and WavespeedAI
+  // if (availableProviders.length <= 1) {
+  //   return null;
+  // }
 
   return (
     <div className="relative">

@@ -1,32 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import ApiKeySection from "./components/ApiKeySection";
 import ImageHistorySection from "./components/ImageHistorySection";
 import GenerateMode from "./components/GenerateMode";
 import EditMode from "./components/EditMode";
+import SequentialEditMode from "./components/SequentialEditMode";
+import SequentialGenerateMode from "./components/SequentialGenerateMode";
 import ResultDisplay from "./components/ResultDisplay";
 import ProviderSelector from "./components/ProviderSelector";
 import { useApiKey } from "./hooks/useApiKey";
 import { useImageHistory } from "./hooks/useImageHistory";
 import { useImageGeneration } from "./hooks/useImageGeneration";
-import { ApiProviderType } from "../../lib/api/types";
+import { ApiProviderType, CustomImageSize } from "../../lib/api/types";
 import { ApiProviderFactory } from "../../lib/api/factory";
 
 export default function Studio() {
   const [prompt, setPrompt] = useState("Dress the model in the clothes and shoes.");
-  const [size, setSize] = useState("square_hd");
+  const [size, setSize] = useState<string | CustomImageSize>("square_hd");
   const [seed, setSeed] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [activeMode, setActiveMode] = useState<'generate' | 'edit'>('generate');
+  const [activeMode, setActiveMode] = useState<'generate' | 'edit' | 'sequential' | 'sequential-generate'>('generate');
   const [generatePrompt, setGeneratePrompt] = useState("Draw a chart showing the typical vegetation distribution in four different climate zones: tropical rainforest, temperate forest, desert, and tundra.");
   const [numImages, setNumImages] = useState(1);
   const [isNumImagesDropdownOpen, setIsNumImagesDropdownOpen] = useState(false);
+  
+  // Sequential edit specific states
+  const [maxImages, setMaxImages] = useState(1);
+  const [isMaxImagesDropdownOpen, setIsMaxImagesDropdownOpen] = useState(false);
   
   // Custom hooks
   const { apiKey, handleApiKeyChange, clearApiKey } = useApiKey();
@@ -39,6 +45,8 @@ export default function Studio() {
     setStatus, 
     runGenerateModel, 
     runEditModel,
+    runSequentialEdit,
+    runSequentialGenerate,
     currentProvider,
     switchProvider,
     uploadFile
@@ -47,6 +55,21 @@ export default function Studio() {
     onSaveImage: saveImageToHistory,
     provider: ApiProviderFactory.getAvailableProviders()[0]
   });
+
+  // Update document title based on current provider
+  useEffect(() => {
+    const title = currentProvider === ApiProviderType.WAVESPEED 
+      ? 'WavespeedAI Studio' 
+      : 'Seedream Studio';
+    document.title = title;
+  }, [currentProvider]);
+
+  // Handle provider switching with tab reset
+  const handleProviderChange = (newProvider: ApiProviderType) => {
+    switchProvider(newProvider);
+    // Always reset to generate tab when switching providers
+    setActiveMode('generate');
+  };
 
   // Use image for editing
   const useImageForEditing = (imageUrl: string) => {
@@ -145,7 +168,7 @@ export default function Studio() {
     }
   };
 
-  const handleSizeSelect = (value: string) => {
+  const handleSizeSelect = (value: string | CustomImageSize) => {
     setSize(value);
     setIsDropdownOpen(false);
   };
@@ -155,11 +178,20 @@ export default function Studio() {
     setIsNumImagesDropdownOpen(false);
   };
 
+  const handleMaxImagesSelect = (value: number) => {
+    setMaxImages(value);
+    setIsMaxImagesDropdownOpen(false);
+  };
+
   const runModel = () => {
     if (activeMode === 'generate') {
       runGenerateModel(generatePrompt, size, numImages, seed);
-    } else {
+    } else if (activeMode === 'edit') {
       runEditModel(prompt, imageUrls, size, seed, numImages);
+    } else if (activeMode === 'sequential') {
+      runSequentialEdit(prompt, imageUrls, size, maxImages, seed);
+    } else if (activeMode === 'sequential-generate') {
+      runSequentialGenerate(generatePrompt, size, maxImages, seed);
     }
   };
 
@@ -174,7 +206,7 @@ export default function Studio() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 p-8 overflow-auto">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <Link 
@@ -199,27 +231,51 @@ export default function Studio() {
         
         {/* Tab Navigation */}
         <div className="flex justify-center mb-6">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20 flex">
             <button
               onClick={() => setActiveMode('generate')}
-              className={`px-6 py-2 rounded-md font-light transition-all duration-200 ${
+              className={`px-4 py-2 rounded-md font-light transition-all duration-200 ${
                 activeMode === 'generate'
                   ? 'bg-white/20 text-white shadow-lg'
                   : 'text-white/70 hover:text-white hover:bg-white/10'
               }`}
             >
-              Generate Images
+              Generate
             </button>
             <button
               onClick={() => setActiveMode('edit')}
-              className={`px-6 py-2 rounded-md font-light transition-all duration-200 ${
+              className={`px-4 py-2 rounded-md font-light transition-all duration-200 ${
                 activeMode === 'edit'
                   ? 'bg-white/20 text-white shadow-lg'
                   : 'text-white/70 hover:text-white hover:bg-white/10'
               }`}
             >
-              Edit Images
+              Edit
             </button>
+            {currentProvider === ApiProviderType.WAVESPEED && (
+              <>
+                <button
+                  onClick={() => setActiveMode('sequential')}
+                  className={`px-3 py-2 rounded-md font-light transition-all duration-200 text-sm ${
+                    activeMode === 'sequential'
+                      ? 'bg-white/20 text-white shadow-lg'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  Seq Edit
+                </button>
+                <button
+                  onClick={() => setActiveMode('sequential-generate')}
+                  className={`px-3 py-2 rounded-md font-light transition-all duration-200 text-sm ${
+                    activeMode === 'sequential-generate'
+                      ? 'bg-white/20 text-white shadow-lg'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  Seq Gen
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -248,8 +304,8 @@ export default function Studio() {
                     <>
                       <p>• Ultra-fast inference: Generate 2K images in just 1.8 seconds</p>
                       <p>• Single image generation (1 image per request)</p>
-                      <p>• Precise instruction editing with high feature retention</p>
-                      <p>• Size formats: Custom dimensions (width*height) from 1024x1024 to 4096x4096</p>
+                      <p>• Supports text-to-image and image editing modes</p>
+                      <p>• Base64 image support for editing operations</p>
                     </>
                   ) : (
                     <>
@@ -273,7 +329,7 @@ export default function Studio() {
 
           <ProviderSelector
             currentProvider={currentProvider}
-            onProviderChange={switchProvider}
+            onProviderChange={handleProviderChange}
             disabled={isGenerating}
           />
 
@@ -295,13 +351,13 @@ export default function Studio() {
                     WavespeedAI Prompt Writing Guide
                   </h4>
                   <div className="text-sm text-white/70 space-y-2">
-                    <p><span className="text-white/90 font-medium">Formula:</span> Use "change action + change object + target feature" for best results</p>
-                    <p><span className="text-white/90 font-medium">Group images:</span> Use "a series of" or "group of images" to maintain consistency</p>
+                    <p><span className="text-white/90 font-medium">Formula:</span> Use &quot;change action + change object + target feature&quot; for best results</p>
+                    <p><span className="text-white/90 font-medium">Group images:</span> Use &quot;a series of&quot; or &quot;group of images&quot; to maintain consistency</p>
                     <p><span className="text-white/90 font-medium">Professional terms:</span> Use original language vocabulary and special image terms</p>
                     <div className="mt-3 p-2 bg-white/5 rounded text-xs">
                       <p className="text-white/60 mb-1">Example prompts:</p>
-                      <p>"A series of anime characters in different poses, vibrant colors, studio lighting"</p>
-                      <p>"Commercial poster design, minimalist style, brand clothing showcase, high-end fashion"</p>
+                      <p>&quot;A series of anime characters in different poses, vibrant colors, studio lighting&quot;</p>
+                      <p>&quot;Commercial poster design, minimalist style, brand clothing showcase, high-end fashion&quot;</p>
                     </div>
                   </div>
                 </div>
@@ -326,33 +382,146 @@ export default function Studio() {
           )}
 
           {activeMode === 'edit' && (
-            <EditMode 
-              imageUrls={imageUrls}
-              onAddImageUrl={addImageUrl}
-              onRemoveImageUrl={removeImageUrl}
-              newImageUrl={newImageUrl}
-              onNewImageUrlChange={setNewImageUrl}
-              prompt={prompt}
-              onPromptChange={setPrompt}
-              numImages={numImages}
-              onNumImagesChange={handleNumImagesSelect}
-              isNumImagesDropdownOpen={isNumImagesDropdownOpen}
-              onToggleNumImagesDropdown={() => setIsNumImagesDropdownOpen(!isNumImagesDropdownOpen)}
-              size={size}
-              onSizeChange={handleSizeSelect}
-              isSizeDropdownOpen={isDropdownOpen}
-              onToggleSizeDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
-              seed={seed}
-              onSeedChange={setSeed}
-              isDragging={isDragging}
-              isUploading={isUploading}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onFileSelect={handleFileSelect}
-              onLoadExamples={loadExamples}
-              currentProvider={currentProvider}
-            />
+            <>
+              {/* Provider-specific editing guide */}
+              {currentProvider === ApiProviderType.WAVESPEED && (
+                <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                  <h4 className="text-white font-medium mb-3 flex items-center">
+                    <span className="text-lg mr-2">✏️</span>
+                    WavespeedAI Image Editing Guide
+                  </h4>
+                  <div className="text-sm text-white/70 space-y-2">
+                    <p><span className="text-white/90 font-medium">Editing operations:</span> Object addition/deletion, style transformation, attribute changes</p>
+                    <p><span className="text-white/90 font-medium">Complex editing:</span> Face swapping, structural adjustments, texture replacement</p>
+                    <p><span className="text-white/90 font-medium">Formula:</span> Use &quot;change action + change object + target feature&quot;</p>
+                    <div className="mt-3 p-2 bg-white/5 rounded text-xs">
+                      <p className="text-white/60 mb-1">Example editing prompts:</p>
+                      <p>&quot;Change the person&apos;s hair to blonde and add sunglasses&quot;</p>
+                      <p>&quot;Replace the background with a sunset beach scene&quot;</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <EditMode 
+                imageUrls={imageUrls}
+                onAddImageUrl={addImageUrl}
+                onRemoveImageUrl={removeImageUrl}
+                newImageUrl={newImageUrl}
+                onNewImageUrlChange={setNewImageUrl}
+                prompt={prompt}
+                onPromptChange={setPrompt}
+                numImages={numImages}
+                onNumImagesChange={handleNumImagesSelect}
+                isNumImagesDropdownOpen={isNumImagesDropdownOpen}
+                onToggleNumImagesDropdown={() => setIsNumImagesDropdownOpen(!isNumImagesDropdownOpen)}
+                size={size}
+                onSizeChange={handleSizeSelect}
+                isSizeDropdownOpen={isDropdownOpen}
+                onToggleSizeDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
+                seed={seed}
+                onSeedChange={setSeed}
+                isDragging={isDragging}
+                isUploading={isUploading}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onFileSelect={handleFileSelect}
+                onLoadExamples={loadExamples}
+                currentProvider={currentProvider}
+              />
+            </>
+          )}
+
+          {activeMode === 'sequential' && (
+            <>
+              {/* Provider-specific sequential editing guide */}
+              {currentProvider === ApiProviderType.WAVESPEED && (
+                <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                  <h4 className="text-white font-medium mb-3 flex items-center">
+                    <span className="text-lg mr-2">🔄</span>
+                    WavespeedAI Sequential Editing Guide
+                  </h4>
+                  <div className="text-sm text-white/70 space-y-2">
+                    <p><span className="text-white/90 font-medium">Multi-image generation:</span> Generate up to 14 variations in a single request</p>
+                    <p><span className="text-white/90 font-medium">Sequential operations:</span> Apply transformations progressively across multiple outputs</p>
+                    <p><span className="text-white/90 font-medium">Input flexibility:</span> Start with existing images or generate from text only</p>
+                    <div className="mt-3 p-2 bg-white/5 rounded text-xs">
+                      <p className="text-white/60 mb-1">Example sequential prompts:</p>
+                      <p>&quot;Create a series of anime characters with different expressions&quot;</p>
+                      <p>&quot;Generate progressive style transformations from realistic to abstract&quot;</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <SequentialEditMode 
+                imageUrls={imageUrls}
+                onAddImageUrl={addImageUrl}
+                onRemoveImageUrl={removeImageUrl}
+                newImageUrl={newImageUrl}
+                onNewImageUrlChange={setNewImageUrl}
+                prompt={prompt}
+                onPromptChange={setPrompt}
+                maxImages={maxImages}
+                onMaxImagesChange={handleMaxImagesSelect}
+                isMaxImagesDropdownOpen={isMaxImagesDropdownOpen}
+                onToggleMaxImagesDropdown={() => setIsMaxImagesDropdownOpen(!isMaxImagesDropdownOpen)}
+                size={size}
+                onSizeChange={handleSizeSelect}
+                isSizeDropdownOpen={isDropdownOpen}
+                onToggleSizeDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
+                seed={seed}
+                onSeedChange={setSeed}
+                isDragging={isDragging}
+                isUploading={isUploading}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onFileSelect={handleFileSelect}
+                onLoadExamples={loadExamples}
+                currentProvider={currentProvider}
+              />
+            </>
+          )}
+
+          {activeMode === 'sequential-generate' && (
+            <>
+              {/* Provider-specific sequential generation guide */}
+              {currentProvider === ApiProviderType.WAVESPEED && (
+                <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                  <h4 className="text-white font-medium mb-3 flex items-center">
+                    <span className="text-lg mr-2">🎯</span>
+                    WavespeedAI Sequential Generation Guide
+                  </h4>
+                  <div className="text-sm text-white/70 space-y-2">
+                    <p><span className="text-white/90 font-medium">Multi-image series:</span> Generate up to 14 related images in one request</p>
+                    <p><span className="text-white/90 font-medium">Consistent themes:</span> Perfect for character variations, style progressions, or product series</p>
+                    <p><span className="text-white/90 font-medium">Batch generation:</span> More efficient than multiple single requests</p>
+                    <div className="mt-3 p-2 bg-white/5 rounded text-xs">
+                      <p className="text-white/60 mb-1">Perfect for:</p>
+                      <p>&quot;Series of character expressions&quot;, &quot;Progressive art styles&quot;, &quot;Product color variations&quot;</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <SequentialGenerateMode 
+                prompt={generatePrompt}
+                onPromptChange={setGeneratePrompt}
+                maxImages={maxImages}
+                onMaxImagesChange={handleMaxImagesSelect}
+                isMaxImagesDropdownOpen={isMaxImagesDropdownOpen}
+                onToggleMaxImagesDropdown={() => setIsMaxImagesDropdownOpen(!isMaxImagesDropdownOpen)}
+                size={size}
+                onSizeChange={handleSizeSelect}
+                isSizeDropdownOpen={isDropdownOpen}
+                onToggleSizeDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
+                seed={seed}
+                onSeedChange={setSeed}
+                currentProvider={currentProvider}
+              />
+            </>
           )}
 
           <button
@@ -361,8 +530,14 @@ export default function Studio() {
             className="w-full py-3 bg-white/20 hover:bg-white/30 disabled:bg-white/10 border border-white/20 rounded-lg text-white font-light tracking-wide transition-all duration-300 backdrop-blur-sm disabled:cursor-not-allowed"
           >
             {isGenerating 
-              ? (activeMode === 'generate' ? "Generating..." : "Editing Images...") 
-              : (activeMode === 'generate' ? "Generate Images" : "Edit Images")
+              ? (activeMode === 'generate' ? "Generating..." : 
+                 activeMode === 'edit' ? "Editing Images..." : 
+                 activeMode === 'sequential' ? "Running Sequential Edit..." : 
+                 "Running Sequential Generation...") 
+              : (activeMode === 'generate' ? "Generate Images" : 
+                 activeMode === 'edit' ? "Edit Images" : 
+                 activeMode === 'sequential' ? "Run Sequential Edit" : 
+                 "Run Sequential Generation")
             }
           </button>
 

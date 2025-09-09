@@ -100,7 +100,7 @@ export class FALProvider extends ApiProvider {
   async editImage(request: ImageEditRequest): Promise<ImageGenerationResponse> {
     try {
       // Validate image URLs limit (FAL supports up to 6 images)
-      if (request.imageUrls.length > 6) {
+      if (request.imageUrls && request.imageUrls.length > 6) {
         throw new Error("FAL Edit API supports maximum 6 input images");
       }
 

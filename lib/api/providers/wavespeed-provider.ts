@@ -3,6 +3,8 @@ import {
   ApiConfig,
   ImageGenerationRequest,
   ImageEditRequest,
+  SequentialEditRequest,
+  SequentialGenerateRequest,
   ImageGenerationResponse,
   QueueStatus,
   CustomImageSize,
@@ -106,15 +108,157 @@ export class WavespeedProvider extends ApiProvider {
   }
 
   async editImage(request: ImageEditRequest): Promise<ImageGenerationResponse> {
-    // Wavespeed supports image editing through the same endpoint with additional parameters
-    // For now, we'll use the text-to-image endpoint with the prompt
-    return await this.generateImage({
-      prompt: request.prompt,
-      imageSize: request.imageSize,
-      numImages: request.numImages,
-      seed: request.seed,
-      syncMode: request.syncMode
-    });
+    try {
+      const size = this.getImageSize(request.imageSize);
+      
+      const payload = {
+        prompt: request.prompt,
+        images: request.imageUrls, // WavespeedAI uses 'images' array
+        size,
+        seed: request.seed || -1,
+        enable_base64_output: false,
+        enable_sync_mode: request.syncMode || false
+      };
+
+      const response = await fetch(`${this.baseUrl}/bytedance/seedream-v4/edit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.apiKey}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+
+      const result: WavespeedResponse = await response.json();
+      
+      if (result.code !== 200) {
+        throw new Error(`API Error: ${result.message}`);
+      }
+
+      const requestId = result.data.id;
+
+      // If sync mode is enabled, wait for completion
+      if (request.syncMode) {
+        return await this.waitForCompletion(requestId);
+      }
+
+      // For async mode, return the request ID for tracking
+      return {
+        images: [],
+        requestId,
+        seed: request.seed
+      };
+    } catch (error) {
+      console.error('WavespeedAI Image Edit Error:', error);
+      throw new Error(`WavespeedAI API Error: ${error}`);
+    }
+  }
+
+  async sequentialEdit(request: SequentialEditRequest): Promise<ImageGenerationResponse> {
+    try {
+      const size = this.getImageSize(request.imageSize);
+      
+      const payload = {
+        prompt: request.prompt,
+        images: request.imageUrls || [], // Optional images array
+        size,
+        max_images: request.maxImages || 1,
+        seed: request.seed || -1,
+        enable_base64_output: false,
+        enable_sync_mode: request.syncMode || false
+      };
+
+      const response = await fetch(`${this.baseUrl}/bytedance/seedream-v4/edit-sequential`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.apiKey}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+
+      const result: WavespeedResponse = await response.json();
+      
+      if (result.code !== 200) {
+        throw new Error(`API Error: ${result.message}`);
+      }
+
+      const requestId = result.data.id;
+
+      // If sync mode is enabled, wait for completion
+      if (request.syncMode) {
+        return await this.waitForCompletion(requestId);
+      }
+
+      // For async mode, return the request ID for tracking
+      return {
+        images: [],
+        requestId,
+        seed: request.seed
+      };
+    } catch (error) {
+      console.error('WavespeedAI Sequential Edit Error:', error);
+      throw new Error(`WavespeedAI API Error: ${error}`);
+    }
+  }
+
+  async sequentialGenerate(request: SequentialGenerateRequest): Promise<ImageGenerationResponse> {
+    try {
+      const size = this.getImageSize(request.imageSize);
+      
+      const payload = {
+        prompt: request.prompt,
+        size,
+        max_images: request.maxImages || 1,
+        seed: request.seed || -1,
+        enable_base64_output: false,
+        enable_sync_mode: request.syncMode || false
+      };
+
+      const response = await fetch(`${this.baseUrl}/bytedance/seedream-v4/sequential`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.apiKey}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+
+      const result: WavespeedResponse = await response.json();
+      
+      if (result.code !== 200) {
+        throw new Error(`API Error: ${result.message}`);
+      }
+
+      const requestId = result.data.id;
+
+      // If sync mode is enabled, wait for completion
+      if (request.syncMode) {
+        return await this.waitForCompletion(requestId);
+      }
+
+      // For async mode, return the request ID for tracking
+      return {
+        images: [],
+        requestId,
+        seed: request.seed
+      };
+    } catch (error) {
+      console.error('WavespeedAI Sequential Generate Error:', error);
+      throw new Error(`WavespeedAI API Error: ${error}`);
+    }
   }
 
   async submitGeneration(request: ImageGenerationRequest): Promise<{ requestId: string }> {
@@ -230,7 +374,19 @@ export class WavespeedProvider extends ApiProvider {
     throw new Error('Image generation timed out');
   }
 
-  async uploadFile(_file: File): Promise<string> {
-    throw new Error('File upload not supported by WavespeedAI provider');
+  async uploadFile(file: File): Promise<string> {
+    // WavespeedAI supports base64 encoded images for editing
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.result && typeof reader.result === 'string') {
+          resolve(reader.result);
+        } else {
+          reject(new Error('Failed to read file'));
+        }
+      };
+      reader.onerror = () => reject(new Error('File reading failed'));
+      reader.readAsDataURL(file);
+    });
   }
 }

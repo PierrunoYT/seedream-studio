@@ -42,14 +42,33 @@ const sizeOptions = [
   { value: "landscape_16_9", label: "Landscape 16:9" },
 ];
 
-const numImagesOptions = [
-  { value: 1, label: "1 Image" },
-  { value: 2, label: "2 Images" },
-  { value: 3, label: "3 Images" },
-  { value: 4, label: "4 Images" },
-  { value: 5, label: "5 Images" },
-  { value: 6, label: "6 Images" },
-];
+const getNumImagesOptions = (provider: ApiProviderType) => {
+  const baseOptions = [
+    { value: 1, label: "1 Image" },
+    { value: 2, label: "2 Images" },
+    { value: 3, label: "3 Images" },
+    { value: 4, label: "4 Images" },
+    { value: 5, label: "5 Images" },
+    { value: 6, label: "6 Images" },
+  ];
+
+  if (provider === ApiProviderType.REPLICATE) {
+    return [
+      ...baseOptions,
+      { value: 7, label: "7 Images" },
+      { value: 8, label: "8 Images" },
+      { value: 9, label: "9 Images" },
+      { value: 10, label: "10 Images" },
+      { value: 11, label: "11 Images" },
+      { value: 12, label: "12 Images" },
+      { value: 13, label: "13 Images" },
+      { value: 14, label: "14 Images" },
+      { value: 15, label: "15 Images" },
+    ];
+  }
+
+  return baseOptions;
+};
 
 export default function EditMode({
   imageUrls,
@@ -79,6 +98,7 @@ export default function EditMode({
   currentProvider
 }: EditModeProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const numImagesOptions = getNumImagesOptions(currentProvider);
   const selectedNumImagesOption = numImagesOptions.find(option => option.value === numImages);
 
   return (

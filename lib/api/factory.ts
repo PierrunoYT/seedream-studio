@@ -1,6 +1,7 @@
 import { ApiProvider, ApiProviderType, ApiConfig } from './types';
 import { FALProvider } from './providers/fal-provider';
 import { WavespeedProvider } from './providers/wavespeed-provider';
+import { ReplicateProvider } from './providers/replicate-provider';
 
 // Factory to create API providers
 export class ApiProviderFactory {
@@ -12,9 +13,10 @@ export class ApiProviderFactory {
       case ApiProviderType.WAVESPEED:
         return new WavespeedProvider(config);
       
+      case ApiProviderType.REPLICATE:
+        return new ReplicateProvider(config);
+      
       // Add other providers here as you implement them
-      // case ApiProviderType.REPLICATE:
-      //   return new ReplicateProvider(config);
       // case ApiProviderType.OPENAI:
       //   return new OpenAIProvider(config);
       
@@ -27,6 +29,7 @@ export class ApiProviderFactory {
     return [
       ApiProviderType.FAL,
       ApiProviderType.WAVESPEED,
+      ApiProviderType.REPLICATE,
       // Add other providers here as they become available
     ];
   }

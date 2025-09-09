@@ -3,7 +3,7 @@ import { ApiProviderFactory } from './factory';
 
 // Main API client that can switch between providers
 export class SeedreamApiClient {
-  private provider: ApiProvider;
+  public provider: ApiProvider;
   private providerType: ApiProviderType;
 
   constructor(providerType: ApiProviderType, config: ApiConfig) {
@@ -69,5 +69,20 @@ export class SeedreamApiClient {
   // Helper method to check if provider supports file upload
   supportsFileUpload(): boolean {
     return !!this.provider.uploadFile;
+  }
+
+  // Sequential methods (if supported by provider)
+  async sequentialEdit(request: ImageEditRequest) {
+    if (!this.provider.sequentialEdit) {
+      throw new Error(`Provider ${this.providerType} does not support sequential edit`);
+    }
+    return this.provider.sequentialEdit(request);
+  }
+
+  async sequentialGenerate(request: ImageGenerationRequest) {
+    if (!this.provider.sequentialGenerate) {
+      throw new Error(`Provider ${this.providerType} does not support sequential generate`);
+    }
+    return this.provider.sequentialGenerate(request);
   }
 }

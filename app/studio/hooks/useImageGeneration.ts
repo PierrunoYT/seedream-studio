@@ -135,6 +135,91 @@ export function useImageGeneration({
     setCurrentProvider(newProvider);
   };
 
+  const runSequentialEdit = async (prompt: string, imageUrls: string[], size: string, maxImages: number, seed?: string) => {
+    if (!apiKey) {
+      setStatus("Your API Key is not set");
+      return;
+    }
+
+    setIsGenerating(true);
+    setStatus("Running sequential edit...");
+    setResultUrl("");
+
+    try {
+      const client = createClient(apiKey);
+      
+      // Check if provider supports sequential edit (only WavespeedAI for now)
+      if (currentProvider !== ApiProviderType.WAVESPEED) {
+        setStatus("Sequential editing is only available with WavespeedAI provider");
+        return;
+      }
+
+      const result = await client.sequentialEdit({
+        prompt,
+        imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
+        imageSize: validateImageSize(size),
+        maxImages,
+        seed: seed ? parseInt(seed) : undefined
+      });
+
+      if (result.images && result.images.length > 0) {
+        const imageUrl = result.images[0].url;
+        setStatus("Sequential edit completed!");
+        setResultUrl(imageUrl);
+        onSaveImage(imageUrl, prompt, 'edit');
+      } else {
+        setStatus("No images generated");
+      }
+    } catch (error) {
+      console.error('Sequential edit error:', error);
+      setStatus(`Request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const runSequentialGenerate = async (prompt: string, size: string, maxImages: number, seed?: string) => {
+    if (!apiKey) {
+      setStatus("Your API Key is not set");
+      return;
+    }
+
+    setIsGenerating(true);
+    setStatus("Running sequential generation...");
+    setResultUrl("");
+
+    try {
+      const client = createClient(apiKey);
+      
+      // Check if provider supports sequential generate (only WavespeedAI for now)
+      if (currentProvider !== ApiProviderType.WAVESPEED) {
+        setStatus("Sequential generation is only available with WavespeedAI provider");
+        return;
+      }
+
+      const result = await client.sequentialGenerate({
+        prompt,
+        imageSize: validateImageSize(size),
+        maxImages,
+        seed: seed ? parseInt(seed) : undefined
+      });
+
+      if (result.images && result.images.length > 0) {
+        const imageUrl = result.images[0].url;
+        setStatus("Sequential generation completed!");
+        setResultUrl(imageUrl);
+        onSaveImage(imageUrl, prompt, 'generate');
+      } else {
+        setStatus("No images generated");
+      }
+    } catch (error) {
+      console.error('Sequential generation error:', error);
+      setStatus(`Request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const uploadFile = async (file: File): Promise<string> => {
     if (!apiKey) {
       throw new Error("API Key is required for file upload");
@@ -174,6 +259,8 @@ export function useImageGeneration({
     setStatus,
     runGenerateModel,
     runEditModel,
+    runSequentialEdit,
+    runSequentialGenerate,
     currentProvider,
     switchProvider,
     uploadFile
