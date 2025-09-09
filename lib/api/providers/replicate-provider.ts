@@ -47,7 +47,7 @@ export class ReplicateProvider extends ApiProvider {
         params.width = request.imageSize.width;
         params.height = request.imageSize.height;
       } else {
-        const aspectRatioMap: Record<string, string> = {
+        const aspectRatioMap: Record<string, "1:1" | "4:3" | "3:4" | "16:9" | "9:16"> = {
           "square": "1:1",
           "square_hd": "1:1", 
           "portrait": "3:4",
@@ -55,7 +55,7 @@ export class ReplicateProvider extends ApiProvider {
           "wide": "16:9",
           "tall": "9:16"
         };
-        params.aspect_ratio = aspectRatioMap[request.imageSize] || "1:1";
+        params.aspect_ratio = aspectRatioMap[request.imageSize as string] || "1:1";
         params.size = "2K";
       }
     } else {
