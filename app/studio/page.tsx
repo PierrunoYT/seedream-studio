@@ -203,8 +203,8 @@ export default function Studio() {
                   </svg>
                   <div>
                     <p className="font-medium text-white/80 mb-1">Security Notice</p>
-                    <p className="mb-2">Your API key is stored locally in your browser for convenience. It's only accessible to you and this website.</p>
-                    <p className="text-xs text-white/60">• Stored in browser's localStorage • Not sent to any third parties • Cleared when you delete browser data</p>
+                    <p className="mb-2">Your API key is stored locally in your browser for convenience. It&apos;s only accessible to you and this website.</p>
+                    <p className="text-xs text-white/60">• Stored in browser&apos;s localStorage • Not sent to any third parties • Cleared when you delete browser data</p>
                   </div>
                 </div>
               </div>
