@@ -1,359 +1,44 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import ApiKeySection from "./components/ApiKeySection";
-import ImageHistorySection from "./components/ImageHistorySection";
-import GenerateMode from "./components/GenerateMode";
-import EditMode from "./components/EditMode";
-import ResultDisplay from "./components/ResultDisplay";
-import { useApiKey } from "./hooks/useApiKey";
-import { useImageHistory } from "./hooks/useImageHistory";
-import { useImageGeneration } from "./hooks/useImageGeneration";
 
 export default function Studio() {
-  const [prompt, setPrompt] = useState("Dress the model in the clothes and shoes.");
-  const [size, setSize] = useState("square_hd");
-  const [seed, setSeed] = useState("");
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [newImageUrl, setNewImageUrl] = useState("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [activeMode, setActiveMode] = useState<'generate' | 'edit'>('generate');
-  const [generatePrompt, setGeneratePrompt] = useState("Draw a chart showing the typical vegetation distribution in four different climate zones: tropical rainforest, temperate forest, desert, and tundra.");
-  const [numImages, setNumImages] = useState(1);
-  const [isNumImagesDropdownOpen, setIsNumImagesDropdownOpen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Custom hooks
-  const { apiKey, handleApiKeyChange, clearApiKey } = useApiKey();
-  const { savedImages, saveImageToHistory, clearImageHistory, removeImageFromHistory } = useImageHistory();
-  const { isGenerating, status, resultUrl, setResultUrl, setStatus, runGenerateModel, runEditModel } = useImageGeneration({
-    apiKey,
-    onSaveImage: saveImageToHistory
-  });
-
-
-  // Use image for editing
-  const useImageForEditing = (imageUrl: string) => {
-    const isAlreadyAdded = imageUrls.includes(imageUrl);
-    
-    if (!isAlreadyAdded) {
-      setImageUrls(prev => [...prev, imageUrl]);
-      setStatus("Image added to editing queue");
-    } else {
-      setStatus("Image already in editing queue");
-    }
-    
-    setActiveMode('edit');
-    
-    // Scroll to edit section
-    setTimeout(() => {
-      const editSection = document.querySelector('[data-edit-section]');
-      if (editSection) {
-        editSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
-    
-    // Clear status after 3 seconds
-    setTimeout(() => {
-      setStatus("");
-    }, 3000);
-  };
-
-  // Add image URL to the list
-  const addImageUrl = () => {
-    if (newImageUrl.trim() && !imageUrls.includes(newImageUrl.trim())) {
-      setImageUrls([...imageUrls, newImageUrl.trim()]);
-      setNewImageUrl("");
-    }
-  };
-
-  // Remove image URL from the list
-  const removeImageUrl = (index: number) => {
-    setImageUrls(imageUrls.filter((_, i) => i !== index));
-  };
-
-  // Upload file to fal-ai storage
-  const uploadFile = async (file: File): Promise<string> => {
-    if (!apiKey) {
-      throw new Error("FAL API Key is required for file upload");
-    }
-
-    try {
-      // Try the correct fal.ai storage endpoint
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch('https://fal.run/storage/upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Key ${apiKey}`,
-          'Accept': 'application/json'
-        },
-        body: formData
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        return result.upload_url || result.url;
-      }
-
-      // Fallback to base64 data URL if storage upload fails
-      console.warn('Storage upload failed, falling back to base64');
-    } catch (error) {
-      console.warn('Storage upload error, falling back to base64:', error);
-    }
-
-    // Fallback: Convert file to base64 data URL
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.result && typeof reader.result === 'string') {
-          resolve(reader.result);
-        } else {
-          reject(new Error('Failed to read file'));
-        }
-      };
-      reader.onerror = () => reject(new Error('File reading failed'));
-      reader.readAsDataURL(file);
-    });
-  };
-
-  // Handle file selection
-  const handleFileSelect = async (files: FileList) => {
-    if (!apiKey) {
-      setStatus("Please enter your FAL API Key first");
-      return;
-    }
-
-    setIsUploading(true);
-    const uploadedUrls: string[] = [];
-    
-    try {
-      for (const file of Array.from(files)) {
-        if (file.type.startsWith('image/')) {
-          setStatus(`Processing ${file.name}...`);
-          const url = await uploadFile(file);
-          uploadedUrls.push(url);
-        }
-      }
-      
-      if (uploadedUrls.length > 0) {
-        setImageUrls(prev => [...prev, ...uploadedUrls]);
-        const usedBase64 = uploadedUrls.some(url => url.startsWith('data:'));
-        if (usedBase64) {
-          setStatus(`Successfully processed ${uploadedUrls.length} image(s) (using base64 encoding)`);
-        } else {
-          setStatus(`Successfully uploaded ${uploadedUrls.length} image(s)`);
-        }
-      } else {
-        setStatus("No valid image files found");
-      }
-    } catch (error) {
-      setStatus(`Upload failed: ${error}`);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  // Handle drag and drop
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    if (e.dataTransfer.files) {
-      handleFileSelect(e.dataTransfer.files);
-    }
-  };
-
-  const sizeOptions = [
-    { value: "square_hd", label: "Square HD (1024x1024)" },
-    { value: "square", label: "Square (512x512)" },
-    { value: "portrait_4_3", label: "Portrait 4:3" },
-    { value: "portrait_16_9", label: "Portrait 16:9" },
-    { value: "landscape_4_3", label: "Landscape 4:3" },
-    { value: "landscape_16_9", label: "Landscape 16:9" },
-  ];
-
-  const numImagesOptions = [
-    { value: 1, label: "1 Image" },
-    { value: 2, label: "2 Images" },
-    { value: 3, label: "3 Images" },
-    { value: 4, label: "4 Images" },
-  ];
-
-  const selectedOption = sizeOptions.find(option => option.value === size);
-  const selectedNumImagesOption = numImagesOptions.find(option => option.value === numImages);
-
-  const handleSizeSelect = (value: string) => {
-    setSize(value);
-    setIsDropdownOpen(false);
-  };
-
-  const handleNumImagesSelect = (value: number) => {
-    setNumImages(value);
-    setIsNumImagesDropdownOpen(false);
-  };
-
-
-
-  const runModel = () => {
-    if (activeMode === 'generate') {
-      runGenerateModel(generatePrompt, size, numImages, seed);
-    } else {
-      runEditModel(prompt, imageUrls, size, seed);
-    }
-  };
-
-  const loadExamples = () => {
-    const examples = [
-      "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_1.png",
-      "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_2.png",
-      "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_3.png",
-      "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_4.png"
-    ];
-    setImageUrls(examples);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex items-center justify-center p-8">
+      <div className="text-center">
+        {/* Coming Soon Message */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 max-w-md mx-auto">
+          <div className="mb-6">
+            <div className="text-6xl mb-4">🚧</div>
+            <h1 className="text-3xl font-light text-white mb-4">Coming Soon!</h1>
+            <p className="text-white/80 text-lg mb-6">
+              Seedream Studio is currently under development. We're working hard to bring you an amazing AI image generation experience.
+            </p>
+            <div className="text-white/60 text-sm mb-6">
+              Stay tuned for updates!
+            </div>
+          </div>
+          
           <Link 
             href="/" 
-            className="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white font-light transition-all duration-300 backdrop-blur-sm group"
+            className="inline-flex items-center px-6 py-3 bg-white/20 hover:bg-white/30 border border-white/20 rounded-lg text-white font-light transition-all duration-300 backdrop-blur-sm"
           >
-            <svg 
-              className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform duration-200" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back to Home
           </Link>
-          <h1 className="text-4xl font-light text-white">Seedream Studio</h1>
-          <div className="w-32"></div>
         </div>
         
-        {/* Tab Navigation */}
-        <div className="flex justify-center mb-6">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20">
-            <button
-              onClick={() => setActiveMode('generate')}
-              className={`px-6 py-2 rounded-md font-light transition-all duration-200 ${
-                activeMode === 'generate'
-                  ? 'bg-white/20 text-white shadow-lg'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              Generate Images
-            </button>
-            <button
-              onClick={() => setActiveMode('edit')}
-              className={`px-6 py-2 rounded-md font-light transition-all duration-200 ${
-                activeMode === 'edit'
-                  ? 'bg-white/20 text-white shadow-lg'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              Edit Images
-            </button>
+        {/* Progress indicator (optional decoration) */}
+        <div className="mt-8 max-w-xs mx-auto">
+          <div className="flex justify-between text-white/40 text-xs mb-2">
+            <span>Progress</span>
+            <span>70%</span>
           </div>
-        </div>
-
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 space-y-6 relative">
-          <ApiKeySection 
-            apiKey={apiKey}
-            onApiKeyChange={handleApiKeyChange}
-            onClearApiKey={clearApiKey}
-          />
-
-          <ImageHistorySection 
-            savedImages={savedImages}
-            onClearHistory={clearImageHistory}
-            onRemoveImage={removeImageFromHistory}
-            onUseImageForEditing={useImageForEditing}
-            onSetResultUrl={setResultUrl}
-          />
-
-          {activeMode === 'generate' && (
-            <GenerateMode 
-              prompt={generatePrompt}
-              onPromptChange={setGeneratePrompt}
-              numImages={numImages}
-              onNumImagesChange={handleNumImagesSelect}
-              isNumImagesDropdownOpen={isNumImagesDropdownOpen}
-              onToggleNumImagesDropdown={() => setIsNumImagesDropdownOpen(!isNumImagesDropdownOpen)}
-              size={size}
-              onSizeChange={handleSizeSelect}
-              isSizeDropdownOpen={isDropdownOpen}
-              onToggleSizeDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
-              seed={seed}
-              onSeedChange={setSeed}
-            />
-          )}
-
-          {activeMode === 'edit' && (
-            <EditMode 
-              imageUrls={imageUrls}
-              onAddImageUrl={addImageUrl}
-              onRemoveImageUrl={removeImageUrl}
-              newImageUrl={newImageUrl}
-              onNewImageUrlChange={setNewImageUrl}
-              prompt={prompt}
-              onPromptChange={setPrompt}
-              size={size}
-              onSizeChange={handleSizeSelect}
-              isSizeDropdownOpen={isDropdownOpen}
-              onToggleSizeDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
-              seed={seed}
-              onSeedChange={setSeed}
-              isDragging={isDragging}
-              isUploading={isUploading}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onFileSelect={handleFileSelect}
-              onLoadExamples={loadExamples}
-            />
-          )}
-
-
-          <button
-            onClick={runModel}
-            disabled={isGenerating}
-            className="w-full py-3 bg-white/20 hover:bg-white/30 disabled:bg-white/10 border border-white/20 rounded-lg text-white font-light tracking-wide transition-all duration-300 backdrop-blur-sm disabled:cursor-not-allowed"
-          >
-            {isGenerating 
-              ? (activeMode === 'generate' ? "Generating..." : "Editing Images...") 
-              : (activeMode === 'generate' ? "Generate Images" : "Edit Images")
-            }
-          </button>
-
-          {status && (
-            <div className="p-4 bg-white/10 rounded-lg">
-              <p className="text-white text-sm">{status}</p>
-            </div>
-          )}
-
-          <ResultDisplay 
-            resultUrl={resultUrl}
-            onUseImageForEditing={useImageForEditing}
-          />
+          <div className="w-full bg-white/10 rounded-full h-2">
+            <div className="bg-gradient-to-r from-blue-400 to-purple-400 h-2 rounded-full" style={{width: '70%'}}></div>
+          </div>
         </div>
       </div>
     </div>
