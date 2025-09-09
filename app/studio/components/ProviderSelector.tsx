@@ -22,11 +22,15 @@ export default function ProviderSelector({
     switch (provider) {
       case ApiProviderType.FAL:
         return "FAL AI";
+      case ApiProviderType.WAVESPEED:
+        return "WavespeedAI";
       // Add other providers here
       // case ApiProviderType.REPLICATE:
       //   return "Replicate";
       // case ApiProviderType.OPENAI:
       //   return "OpenAI DALL-E";
+      default:
+        return provider;
     }
   };
 
@@ -34,6 +38,8 @@ export default function ProviderSelector({
     switch (provider) {
       case ApiProviderType.FAL:
         return "Bytedance Seedream v4 via FAL AI";
+      case ApiProviderType.WAVESPEED:
+        return "Bytedance Seedream v4 via WavespeedAI - State-of-art image generation with ultra-fast inference";
       // Add other providers here
       default:
         return "";

@@ -34,6 +34,22 @@ export const PROVIDER_CONFIGS: Record<ApiProviderType, ProviderConfig> = {
       imageEdit: '$0.055 per image'
     }
   },
+  [ApiProviderType.WAVESPEED]: {
+    name: 'wavespeed',
+    displayName: 'WavespeedAI',
+    description: 'Bytedance Seedream v4 via WavespeedAI - State-of-art image generation with ultra-fast inference',
+    supportsTextToImage: true,
+    supportsImageEdit: true,
+    supportsFileUpload: false,
+    supportsQueue: true,
+    apiKeyRequired: true,
+    maxImageSize: { width: 4096, height: 4096 },
+    supportedFormats: ['JPEG', 'PNG', 'WebP'],
+    pricing: {
+      textToImage: 'Variable pricing',
+      imageEdit: 'Variable pricing'
+    }
+  },
   // Add configurations for other providers here
   // [ApiProviderType.REPLICATE]: {
   //   name: 'replicate',

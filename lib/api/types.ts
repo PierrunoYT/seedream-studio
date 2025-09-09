@@ -77,6 +77,7 @@ export abstract class ApiProvider {
 
 export enum ApiProviderType {
   FAL = 'fal',
+  WAVESPEED = 'wavespeed',
   // Add other providers here
   // REPLICATE = 'replicate',
   // OPENAI = 'openai'
