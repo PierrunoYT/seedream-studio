@@ -336,11 +336,13 @@ export class WavespeedProvider extends ApiProvider {
         throw new Error(`Generation not completed yet. Status: ${result.data.status}`);
       }
 
+      // Parse dimensions from the original request size if available
+      const defaultDimensions = { width: 2048, height: 2048 };
+      
       return {
         images: result.data.outputs.map(url => ({
           url,
-          width: 2048, // Default, could be parsed from size parameter
-          height: 2048
+          ...defaultDimensions // WavespeedAI doesn't return dimensions, use defaults
         })),
         requestId,
         seed: undefined // WavespeedAI doesn't return the seed in results

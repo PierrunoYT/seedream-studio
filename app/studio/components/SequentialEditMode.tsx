@@ -57,7 +57,6 @@ const maxImagesOptions = [
   { value: 12, label: "12 Images" },
   { value: 13, label: "13 Images" },
   { value: 14, label: "14 Images" },
-  { value: 15, label: "15 Images" },
 ];
 
 export default function SequentialEditMode({
