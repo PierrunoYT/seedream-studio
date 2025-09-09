@@ -26,6 +26,7 @@ export default function ImageHistorySection({
   onSetResultUrl 
 }: ImageHistorySectionProps) {
   const [showImageHistory, setShowImageHistory] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<SavedImage | null>(null);
 
   if (savedImages.length === 0) return null;
 
@@ -111,10 +112,10 @@ export default function ImageHistorySection({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onSetResultUrl(image.url);
+                          setSelectedImage(image);
                         }}
                         className="flex-1 px-2 py-1 bg-white/20 hover:bg-white/30 rounded text-xs text-white transition-colors"
-                        title="View full size"
+                        title="View with prompt"
                       >
                         View
                       </button>
@@ -135,6 +136,102 @@ export default function ImageHistorySection({
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 max-w-4xl max-h-[90vh] overflow-y-auto border border-white/20">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-white">
+                {selectedImage.mode === 'generate' ? 'Generated Image' : 'Edited Image'}
+              </h3>
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="text-white/60 hover:text-white transition-colors"
+                title="Close"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Image */}
+              <div className="flex-shrink-0">
+                <div className="relative rounded-lg overflow-hidden bg-white/5 border border-white/10">
+                  <Image
+                    src={selectedImage.url}
+                    alt={`${selectedImage.mode} image`}
+                    width={512}
+                    height={512}
+                    className="max-w-full h-auto"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              </div>
+              
+              {/* Details */}
+              <div className="flex-1 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-white/80 mb-2">Prompt</label>
+                  <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                    <p className="text-white/90 leading-relaxed">{selectedImage.prompt}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-white/80 mb-1">Type</label>
+                    <div className={`inline-flex px-3 py-1 rounded-full text-sm ${
+                      selectedImage.mode === 'generate' ? 'bg-green-500/20 text-green-300' : 'bg-blue-500/20 text-blue-300'
+                    }`}>
+                      {selectedImage.mode === 'generate' ? 'Generated' : 'Edited'}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-white/80 mb-1">Date</label>
+                    <p className="text-white/90">{new Date(selectedImage.timestamp).toLocaleString()}</p>
+                  </div>
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-3 pt-4">
+                  <button
+                    onClick={() => {
+                      onSetResultUrl(selectedImage.url);
+                      setSelectedImage(null);
+                    }}
+                    className="flex-1 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-white font-medium transition-colors"
+                  >
+                    Set as Result
+                  </button>
+                  <button
+                    onClick={() => {
+                      onUseImageForEditing(selectedImage.url);
+                      setSelectedImage(null);
+                    }}
+                    className="flex-1 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg text-white font-medium transition-colors"
+                  >
+                    Use for Editing
+                  </button>
+                  <a
+                    href={selectedImage.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 rounded-lg text-white font-medium transition-colors text-center"
+                  >
+                    Open Original
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

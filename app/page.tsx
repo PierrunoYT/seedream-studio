@@ -1,15 +1,7 @@
-"use client";
-
-import { useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
 
 export default function Home() {
-  const [showComingSoon, setShowComingSoon] = useState(false);
-
-  const handleStudioClick = () => {
-    setShowComingSoon(true);
-    setTimeout(() => setShowComingSoon(false), 3000);
-  };
 
   return (
     <div className="font-sans min-h-screen relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex items-center justify-center">
@@ -57,24 +49,11 @@ export default function Home() {
         </p>
         
         {/* Go to Studio Button */}
-        <div className="mt-8 relative">
-          <button 
-            onClick={handleStudioClick}
-            className="px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-white font-light tracking-wide transition-all duration-300 backdrop-blur-sm"
-          >
+        <Link href="/studio">
+          <button className="mt-8 px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-white font-light tracking-wide transition-all duration-300 backdrop-blur-sm">
             Go to Studio
           </button>
-          
-          {/* Coming Soon Message */}
-          {showComingSoon && (
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 px-6 py-3 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-white/20">
-              <p className="text-gray-800 font-medium text-sm whitespace-nowrap">
-                🚧 Coming Soon! Studio is under development
-              </p>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white/90 rotate-45 border-l border-t border-white/20"></div>
-            </div>
-          )}
-        </div>
+        </Link>
       </main>
       
       {/* Corner lighting effects */}
