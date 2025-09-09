@@ -220,7 +220,7 @@ export default function Studio() {
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 space-y-6 relative">
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 space-y-6 relative" suppressHydrationWarning>
           <ApiKeySection 
             apiKey={apiKey}
             onApiKeyChange={handleApiKeyChange}
