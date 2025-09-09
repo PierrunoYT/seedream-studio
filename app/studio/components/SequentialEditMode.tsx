@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import SizeDropdown from "./SizeDropdown";
-import { ApiProviderType } from "../../../lib/api/types";
+import { ApiProviderType, CustomImageSize } from "../../../lib/api/types";
 
 interface SequentialEditModeProps {
   imageUrls: string[];
@@ -17,8 +17,8 @@ interface SequentialEditModeProps {
   onMaxImagesChange: (value: number) => void;
   isMaxImagesDropdownOpen: boolean;
   onToggleMaxImagesDropdown: () => void;
-  size: string;
-  onSizeChange: (value: string) => void;
+  size: string | CustomImageSize;
+  onSizeChange: (value: string | CustomImageSize) => void;
   isSizeDropdownOpen: boolean;
   onToggleSizeDropdown: () => void;
   seed: string;

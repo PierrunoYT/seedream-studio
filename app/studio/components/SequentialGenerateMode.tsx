@@ -1,7 +1,7 @@
 "use client";
 
 import SizeDropdown from "./SizeDropdown";
-import { ApiProviderType } from "../../../lib/api/types";
+import { ApiProviderType, CustomImageSize } from "../../../lib/api/types";
 
 interface SequentialGenerateModeProps {
   prompt: string;
@@ -10,8 +10,8 @@ interface SequentialGenerateModeProps {
   onMaxImagesChange: (value: number) => void;
   isMaxImagesDropdownOpen: boolean;
   onToggleMaxImagesDropdown: () => void;
-  size: string;
-  onSizeChange: (value: string) => void;
+  size: string | CustomImageSize;
+  onSizeChange: (value: string | CustomImageSize) => void;
   isSizeDropdownOpen: boolean;
   onToggleSizeDropdown: () => void;
   seed: string;
