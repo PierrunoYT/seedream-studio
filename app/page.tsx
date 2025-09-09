@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -43,6 +44,13 @@ export default function Home() {
         <p className="mt-6 text-lg text-white/80 font-light tracking-wide">
           Where Dreams Take Shape
         </p>
+        
+        {/* Go to Studio Button */}
+        <Link href="/studio">
+          <button className="mt-8 px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-white font-light tracking-wide transition-all duration-300 backdrop-blur-sm">
+            Go to Studio
+          </button>
+        </Link>
       </main>
       
       {/* Corner lighting effects */}

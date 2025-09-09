@@ -356,11 +356,28 @@
 
 
 
-  @keyframes wave-letter {
-    0%, 60%, 100% {
-      transform: translateY(0px);
-    }
-    30% {
-      transform: translateY(-8px);
-    }
+  @keyframes wave-letter {
+    0%, 60%, 100% {
+      transform: translateY(0px);
+    }
+    30% {
+      transform: translateY(-8px);
+    }
+  }
+
+  /* Custom select dropdown styling for glassmorphism purple theme */
+  select option {
+    background-color: rgba(88, 28, 135, 0.95) !important;
+    color: white !important;
+    padding: 8px 12px;
+  }
+
+  select option:checked {
+    background-color: rgba(147, 51, 234, 0.9) !important;
+    color: white !important;
+  }
+
+  select option:hover {
+    background-color: rgba(147, 51, 234, 0.7) !important;
+    color: white !important;
   }
