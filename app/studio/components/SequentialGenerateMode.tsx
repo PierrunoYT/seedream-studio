@@ -174,7 +174,16 @@ export default function SequentialGenerateMode({
 
         {/* Seed Input */}
         <div className="mt-6">
-          <label className="block text-white mb-2">Seed (Optional)</label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-white">Seed (Optional)</label>
+            <button
+              type="button"
+              onClick={() => onSeedChange(Math.floor(Math.random() * 1000000).toString())}
+              className="text-sm text-white/70 hover:text-white transition-colors"
+            >
+              Random
+            </button>
+          </div>
           <input
             type="number"
             value={seed}

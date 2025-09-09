@@ -207,7 +207,7 @@ export default function Studio() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 p-8 overflow-auto">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto pb-48">
         <div className="flex items-center justify-between mb-8">
           <Link 
             href="/" 
