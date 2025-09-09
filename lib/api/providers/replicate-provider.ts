@@ -33,34 +33,49 @@ export class ReplicateProvider extends ApiProvider {
   private buildReplicateParams(request: ImageGenerationRequest | ImageEditRequest): Partial<ReplicateParams> {
     const params: Partial<ReplicateParams> = {
       prompt: request.prompt,
-      max_images: request.numImages || 1,
       sequential_image_generation: "disabled"
     };
 
+    // Handle max_images (1-15 range)
+    const numImages = request.numImages || 1;
+    params.max_images = Math.min(Math.max(numImages, 1), 15);
+
+    // Handle image input (1-10 images for image-to-image)
     if ('imageUrls' in request && request.imageUrls?.length) {
-      params.image_input = request.imageUrls;
+      params.image_input = request.imageUrls.slice(0, 10); // Limit to 10 images
     }
 
+    // Handle image size and aspect ratio
     if (request.imageSize) {
       if (typeof request.imageSize === 'object' && 'width' in request.imageSize && 'height' in request.imageSize) {
+        // Custom dimensions (1024-4096 range)
         params.size = "custom";
-        params.width = request.imageSize.width;
-        params.height = request.imageSize.height;
+        params.width = Math.min(Math.max(request.imageSize.width, 1024), 4096);
+        params.height = Math.min(Math.max(request.imageSize.height, 1024), 4096);
       } else {
-        const aspectRatioMap: Record<string, "1:1" | "4:3" | "3:4" | "16:9" | "9:16"> = {
-          "square": "1:1",
-          "square_hd": "1:1", 
-          "portrait": "3:4",
-          "landscape": "4:3",
-          "wide": "16:9",
-          "tall": "9:16"
+        // Preset sizes with aspect ratios
+        const sizeAspectMap: Record<string, { size: "1K" | "2K" | "4K", aspect: string }> = {
+          "square": { size: "1K", aspect: "1:1" },
+          "square_hd": { size: "2K", aspect: "1:1" },
+          "portrait_4_3": { size: "2K", aspect: "3:4" },
+          "portrait_16_9": { size: "2K", aspect: "9:16" },
+          "landscape_4_3": { size: "2K", aspect: "4:3" },
+          "landscape_16_9": { size: "2K", aspect: "16:9" }
         };
-        params.aspect_ratio = aspectRatioMap[request.imageSize as string] || "1:1";
-        params.size = "2K";
+        
+        const config = sizeAspectMap[request.imageSize as string];
+        if (config) {
+          params.size = config.size;
+          params.aspect_ratio = config.aspect as any;
+        } else {
+          params.size = "2K";
+          params.aspect_ratio = "1:1";
+        }
       }
     } else {
+      // Defaults
       params.size = "2K";
-      params.aspect_ratio = "1:1";
+      params.aspect_ratio = "match_input_image";
     }
 
     return params;
@@ -70,7 +85,7 @@ export class ReplicateProvider extends ApiProvider {
     try {
       const params = this.buildReplicateParams(request);
       const output = await this.replicate.run(
-        "bytedance/seedream-4:a5b6d65516c0f279e518a6151d3844758b347a95164ead571533a58a1a6c611d",
+        "bytedance/seedream-4",
         {
           input: {
             ...params,
@@ -84,8 +99,8 @@ export class ReplicateProvider extends ApiProvider {
       }
 
       return {
-        images: output.map((url: string) => ({
-          url: url,
+        images: output.map((item: any) => ({
+          url: typeof item === 'string' ? item : item.url(),
         })),
         seed: request.seed,
       };
@@ -99,7 +114,7 @@ export class ReplicateProvider extends ApiProvider {
     try {
       const params = this.buildReplicateParams(request);
       const output = await this.replicate.run(
-        "bytedance/seedream-4:a5b6d65516c0f279e518a6151d3844758b347a95164ead571533a58a1a6c611d",
+        "bytedance/seedream-4",
         {
           input: {
             ...params,
@@ -113,8 +128,8 @@ export class ReplicateProvider extends ApiProvider {
       }
 
       return {
-        images: output.map((url: string) => ({
-          url: url,
+        images: output.map((item: any) => ({
+          url: typeof item === 'string' ? item : item.url(),
         })),
         seed: request.seed,
       };
