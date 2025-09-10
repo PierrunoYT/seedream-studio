@@ -26,13 +26,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://seedream.studio',
+    url: 'https://www.seedream.studio',
     title: 'Seedream Studio',
     description: 'Where Dreams Take Shape - Creative studio bringing your visions to life',
     siteName: 'Seedream Studio',
     images: [
       {
-        url: 'https://seedream.studio/api/og',
+        url: 'https://www.seedream.studio/api/og',
         width: 1200,
         height: 630,
         alt: 'Seedream Studio - Where Dreams Take Shape',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Seedream Studio',
     description: 'Where Dreams Take Shape - Creative studio bringing your visions to life',
-    images: ['https://seedream.studio/api/og'],
+    images: ['https://www.seedream.studio/api/og'],
     creator: '@seedreamstudio',
   },
   
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     'og:image:width': '1200',
     'og:image:height': '630',
     'og:image:type': 'image/png',
-    'twitter:image': 'https://seedream.studio/api/og',
+    'twitter:image': 'https://www.seedream.studio/api/og',
     'twitter:image:width': '1200',
     'twitter:image:height': '630',
     'application-name': 'Seedream Studio',
@@ -82,7 +82,7 @@ export const metadata: Metadata = {
   manifest: '/favicon/site.webmanifest',
   robots: 'index, follow',
   alternates: {
-    canonical: 'https://seedream.studio',
+    canonical: 'https://www.seedream.studio',
   },
 };
 
